@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Cadastro de Produtos{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <h1 class="display-4">Cadastro de Produtos</h1>
+    </div>
+    <div class="row">
+        <div class="col">
+            <form action="{{ url_for('criar_produto') }}" method="post">
+                <div class="form-group">
+                    <label for="idProduto">Id</label>
+                    <input type="text" class="form-control" name="idProduto" id="idProduto" required disabled >
+                </div>
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <input type="text" class="form-control" name="descProduto" id="descProduto" placeholder="Descrição do Produto" required>
+                </div>
+                <div class="form-group">
+                    <label>Marca</label>
+                    <input type="text" class="form-control" name="marcaProduto" id="marcaProduto" placeholder="Marca do Produto" required>
+                </div>
+                <button type="submit"  class="btn btn-success">Salvar</button>
+            </form>
+
+            <br>
+
+            {% if msg %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+              <strong>{{ msg }}</strong>
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

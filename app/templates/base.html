@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>{% block title %}{% endblock %}</title>
+		<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+
+		<link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.css') }}">
+
+	</head>
+	<body class="loggedin">
+		<nav class="navtop">
+			<div>
+				<h1>Plot Twist Gerenciamento</h1>
+                <a href="{{ url_for('home') }}"><i class="fas fa-home"></i>Início</a>
+				<a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i>Sair</a>
+			</div>
+		</nav>
+		<div class="content">
+			{% block content %}{% endblock %}
+		</div>
+	
+	<script src="{{ url_for('static', filename='jquery-3.4.1.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='popper.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='bootstrap.js') }}"></script>
+	
+	</body>
+</html>
