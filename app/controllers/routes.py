@@ -30,7 +30,6 @@ def criar_produto():
             msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)
             return render_template('cadastro-produtos.html', msg=msg)
 
-# http://localhost:5000/python/logout - this will be the logout page
 
 
 

@@ -6,31 +6,21 @@ from flask import render_template, request, redirect, url_for, session
 
 connection = db.db_connection()
 
-@app.route('/clientes')
-def cliente_inicio():
-    # Check if user is loggedin
-    if 'loggedin' in session:
-        return render_template('clientes.html',
-                               username=session['username'],
-                               loggedin=session['loggedin'],
-                               breadcrumb='Clientes',
-                               page_header='Menu de Navegação')
-    # User is not loggedin redirect to login page
-    return redirect(url_for('login'))
-
-
 @app.route('/cadastro', methods=['GET', 'POST'])
-def redirecionar():
+def redirecionarCadastro(mensagem = 'teste'):
+    msg = mensagem
     if 'loggedin' in session:
         return render_template('clientes-cadastro.html',
                                 username=session['username'],
                                 loggedin=session['loggedin'],
                                 breadcrumb='Cadastro Clientes',
-                                page_header='Menu de Cadastro')
+                                page_header='Menu de Cadastro',
+                                msg='teste')
     return redirect(url_for('login'))
 
 @app.route('/cadastrar_cliente', methods=['GET', 'POST'])
 def cadastrar_cliente():
+    msg = ''
     if request.method == 'POST' and 'nomeCliente' in request.form \
                                 and 'cpfCliente' in request.form \
                                 and 'celularCliente' in request.form \
@@ -45,8 +35,8 @@ def cadastrar_cliente():
             cursor.execute('INSERT INTO cliente (Nome, CPF, Celular, Email) VALUES (%s, %s, %s, %s)', (nomeCliente, cpfCliente, celularCliente, emailCliente))
             connection.commit()
             msg = 'Cadastro realizado com sucesso!'
-            return redirect(url_for('redirecionar'))
+            return redirecionarCadastro(msg)
 
         except mysql.connector.Error as err:
-            msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)
-            return redirect(url_for('redirecionar'))
+            msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {0}'.format(err)
+            return redirecionarCadastro(msg)

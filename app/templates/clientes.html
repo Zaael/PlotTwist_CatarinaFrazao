@@ -32,10 +32,21 @@
 
 {% block content %}
     <h5>O que deseja fazer?</h5>
-    <form action="{{ url_for('redirecionar') }}">
-    <button type="submit" class="btn btn-lg btn-primary">Cadastro</button>
-    <button type="submit" class="btn btn-lg btn-primary">Consulta</button>
-    <button type="submit" class="btn btn-lg btn-primary">Alteração</button>
+    <br>
+
+    <form action="{{ url_for('redirecionarCadastro') }}">
+         <button type="submit" class="btn btn-lg btn-primary">Cadastro</button>
+
+    </form>
+    <br>
+    <form action="{{ url_for('redirecionarConsulta') }}">
+        <button type="submit" class="btn btn-lg btn-primary">Consulta</button>
+    </form>
+    <br>
+
+    <form>
+
+        <button type="submit" class="btn btn-lg btn-primary">Alteração</button>
     </form>
 {% endblock %}
 

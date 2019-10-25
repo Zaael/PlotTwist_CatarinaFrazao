@@ -31,26 +31,31 @@
 {% endblock %}
 
 {% block content %}
-    <h5>Vamos cadastrar alguns clientes!</h5>
+    <h5>Cliente novo? Vamos cadastra-lo!</h5>
     <div class="col">
         <form action="{{ url_for('cadastrar_cliente') }}" method="post">
             <div class="form-group">
                 <label>Nome</label>
-                <input type="text" class="form-control" name="nomeCliente" id="nomeCliente" placeholder="Nome do Cliente" required>
+                <input type="text" class="form-control" name="nomeCliente" 
+                id="nomeCliente" placeholder="Nome do Cliente" maxlength="35"  required>
             </div>
             <div class="form-group">
                 <label>CPF</label>
-                <input type="text" class="form-control" name="cpfCliente" id="cpfCliente" placeholder="CPF do Cliente" required>
+                <input type="text" class="form-control" name="cpfCliente" 
+                id="cpfCliente" placeholder="Digite sem pontos ou traços" maxlength="11" required>
             </div>
             <div class="form-group">
                 <label>Celular</label>
-                <input type="text" class="form-control" name="celularCliente" id="celularCliente" placeholder="Celular do Cliente" required>
+                <input type="text" class="form-control" name="celularCliente" 
+                id="celularCliente" placeholder="Celular do Cliente" maxlength="9" required>
             </div>
             <div class="form-group">
                 <label>E-mail</label>
-                <input type="text" class="form-control" name="emailCliente" id="emailCliente" placeholder="Email do Cliente" required>
+                <input type="text" class="form-control" name="emailCliente" 
+                id="emailCliente" placeholder="Email do Cliente" required>
             </div>
             <button type="submit"  class="btn btn-success">Salvar</button>
+            <button type="reset" class="btn btn-success">Apagar</button>
         </form>
 
         <br>

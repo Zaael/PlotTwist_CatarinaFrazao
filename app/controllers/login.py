@@ -5,19 +5,7 @@ from flask import render_template, request, redirect, url_for, session
 connection = db.db_connection()
 
 
-@app.route('/')
-@app.route('/index/')
-def index():
-    if 'loggedin' in session:
-        return render_template('dashboard.html',
-                               loggedin=session['loggedin'],
-                               username=session['username'],
-                               breadcrumb='parâmetro breadcrumb',
-                               page_header='parâmetro page_header')
-    return redirect(url_for('login'))
-
-
-@app.route('/login', methods=['GET', 'POST']) 
+@app.route('/', methods=['GET', 'POST']) 
 def login():
     msg = ''
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
