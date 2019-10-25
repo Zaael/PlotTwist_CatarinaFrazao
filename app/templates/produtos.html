@@ -1,6 +1,6 @@
 {% extends 'base-template.html' %}
 
-{% block title %} Fornecedor {% endblock %}
+{% block title %} Produtos {% endblock %}
 
 {% if loggedin %} 
 
@@ -33,8 +33,8 @@
 {% block content %}
     <h5>O que deseja fazer?</h5>
     <form>
-    <button type="submit" class="btn btn-lg btn-primary" formaction="{{ url_for('cadastro_fornecedor') }}">Cadastro</button>
-    <button type="submit" class="btn btn-lg btn-primary" formaction="{{ url_for('buscar') }}">Consulta</button>
+    <button type="submit" class="btn btn-lg btn-primary" formaction="{{ url_for('redirecionarProduto') }}">Cadastro</button>
+    <button type="submit" class="btn btn-lg btn-primary">Consulta</button>
     <button type="submit" class="btn btn-lg btn-primary">Alteração</button>
     </form>
 {% endblock %}

@@ -13,10 +13,11 @@
 	
 	<!--Custom Font-->
 	<link href="https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
-	<!--[if lt IE 9]>
-	<script src="js/html5shiv.js"></script>
-	<script src="js/respond.min.js"></script>
-	<![endif]-->
+	<script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+	
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+	<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+
 </head>
 <body>
 
@@ -54,24 +55,9 @@
 		<ul class="nav menu">
 			<li class="active"><a href="index.html"><em class="fa fa-dashboard">&nbsp;</em> Home</a></li>
 			<li><a href="widgets.html"><em class="fa fa-calendar">&nbsp;</em> Vendas</a></li>
-			<li><a href="charts.html"><em class="fa fa-bar-chart">&nbsp;</em> Clientes</a></li>
-			<li><a href="elements.html"><em class="fa fa-toggle-off">&nbsp;</em>Fornecedor</a></li>
-			<li class="parent "><a data-toggle="collapse" href="#sub-item-1">
-				<em class="fa fa-navicon">&nbsp;</em> Produto <span data-toggle="collapse" href="#sub-item-1" class="icon pull-right"><em class="fa fa-plus"></em></span>
-				</a>
-				<ul class="children collapse" id="sub-item-1">
-					<li><a class="" href="#">
-						<span class="fa fa-arrow-right">&nbsp;</span> Consulta
-					</a></li>
-					<li><a class="" href="#">
-						<span class="fa fa-arrow-right">&nbsp;</span> Cadastro
-					</a></li>
-					<li><a class="" href="#">
-						<span class="fa fa-arrow-right">&nbsp;</span> Alterar
-					</a></li>
-
-				</ul>
-			</li>
+				<li><a href="{{url_for('cliente_inicio')}}"><em class="fa fa-bar-chart">&nbsp;</em> Clientes</a></li>
+			<li><a href="{{url_for('fornecedor')}}"><em class="fa fa-toggle-off">&nbsp;</em>Fornecedores</a></li>
+			<li><a href="{{url_for('produto')}}"><em class="fa fa-toggle-off">&nbsp;</em>Produtos</a></li>
 			<li><a href="{{ url_for('logout') }}"><em class="fa fa-power-off">&nbsp;</em> Logout</a></li>
 		</ul>
 	</div><!--/.sidebar-->
@@ -100,22 +86,10 @@
 
 	{% block login %}{% endblock %}
 
-	<script src="{{ url_for('static', filename='js/jquery-1.11.1.min.js') }}"></script>
+	<!-- <script src="{{ url_for('static', filename='js/jquery-1.11.1.min.js') }}"></script> -->
 	<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/bootstrap-datepicker.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/custom.js') }}"></script>
-
-	<script>
-	window.onload = function () {
-	var chart1 = document.getElementById("line-chart").getContext("2d");
-		window.myLine = new Chart(chart1).Line(lineChartData, {
-		responsive: true,
-		scaleLineColor: "rgba(0,0,0,.2)",
-		scaleGridLineColor: "rgba(0,0,0,.05)",
-		scaleFontColor: "#c5c7cc"
-		});
-	};
-	</script>
 		
 </body>
 </html>
