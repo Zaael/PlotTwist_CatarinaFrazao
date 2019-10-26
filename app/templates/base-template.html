@@ -10,10 +10,19 @@
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/datepicker3.css') }}">
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-	<!-- Datatables-->
+
 	<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
-	<link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
 	<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/1.6.1/js/dataTables.buttons.min.js"></script>
+	<script src="https://cdn.datatables.net/select/1.3.1/js/dataTables.select.min.js"></script>
+	<script src="https://editor.datatables.net/extensions/Editor/js/dataTables.editor.min.js"></script>
+	<script src="{{ url_for('static', filename='bootstrap.js') }}"></script>
+
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
+	<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.1/css/buttons.dataTables.min.css">
+	<link rel="stylesheet" href="https://cdn.datatables.net/select/1.3.1/css/select.dataTables.min.css">
+	<link rel="stylesheet" href="https://editor.datatables.net/extensions/Editor/css/editor.dataTables.min.css">
+
 
 
 	<!--Custom Font-->
@@ -99,35 +108,18 @@
     </div>
 	<!-- block content-->
 
+
+	<!-- {% block login %}{% endblock %} -->
+    <!-- scripts -->
+	<!-- <script src="{{ url_for('static', filename='js/jquery-1.11.1.min.js') }}"></script> -->
+	<!-- <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/bootstrap-datepicker.js') }}"></script> -->
+	<!-- <script src="{{ url_for('static', filename='js/custom.js') }}"></script> -->
+	<!-- Datatables-->
+	
+
+
 	{% endif %} <!--/endif loggedin-->
 
-	{% block login %}{% endblock %}
-    <!-- scripts -->
-  
-	<!-- <script src="{{ url_for('static', filename='js/jquery-1.11.1.min.js') }}"></script> -->
-	<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-	<script src="{{ url_for('static', filename='js/bootstrap-datepicker.js') }}"></script>
-	<script src="{{ url_for('static', filename='js/custom.js') }}"></script>
-	<script src="{{ url_for('static', filename='bootstrap.js') }}"></script>
-	<!--
-	<script>
-		$(document).ready(function() {
-			console.log("começou");
-			$('#listar-cliente th').click(function(){
-				console.log("encontrou");
-				var href = $(this).find("a").attr("href");
-				alert(href);
-			})
-			$('#listar-cliente').DataTable( {
-
-		
-		
-				"ajax": "{{ url_for('consultar_cliente') }}",
-		
-			} );
-			console.log("terminou")
-		} );
-		</script>
-		-->
 </body>
 </html>

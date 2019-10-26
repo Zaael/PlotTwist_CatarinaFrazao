@@ -44,29 +44,52 @@
                 </thead>
             </table>
     </div>
-    <script>
-            $(document).ready(function() {
-                var data = "{{ url_for('consultar_cliente') }}";
+
+
+
+
+<script>
+    
+var editor; // use a global for the submit and return data rendering in the examples
+ 
+ $(document).ready(function() {
+     editor = new $.fn.dataTable.Editor( {
+
+
+     } );
+  
+     $('#listar-cliente').DataTable( {
+         dom: "Bfrtip",
+            "scrollY":        "250px",
+            "scrollCollapse": true,
+            "paging":         false,
+            "ajax": "{{ url_for('consultar_cliente') }}",
+
+         select: true,
+         buttons: [
+             { extend: "create", editor: editor },
+             { extend: "edit",   editor: editor },
+             { extend: "remove", editor: editor }
+         ]
+     } );
+ } );
+
+
+        /*    $(document).ready(function() {
                 $('#listar-cliente').DataTable( {
                     "scrollY":        "250px",
                     "scrollCollapse": true,
                     "paging":         false,
                     "ajax": "{{ url_for('consultar_cliente') }}",
-                    "columns": [
-                        { "data": "Nome" },
-                        { "data": "CPF" },
-                        { "data": "Celular" },
-                        { "data": "Email" }
-            
-                    ]
+
                 } );
             } );
+            */
             </script>
+
 {% endblock %}
-
-
-
 {% endif %}
+
 
 
 
