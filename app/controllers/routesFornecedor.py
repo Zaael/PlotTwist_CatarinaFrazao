@@ -50,42 +50,69 @@ def criar_fornecedor():
 @app.route('/buscar',methods=['GET','POST'])
 def buscar():
     if 'loggedin' in session:
-        return render_template('buscar_fornecedor.html',
+        fornecedores = ListaFornecedores()
+        return render_template('buscar_fornecedor.html', fornecedores= fornecedores,
                                 username=session['username'],
                                 loggedin=session['loggedin'],
                                 breadcrumb='Consultar Fornecedores',
                                 page_header='Menu de Consulta')
     return redirect(url_for('login'))
 
-@app.route('/buscar_fornecedores', methods=['GET','POST'])
-def buscar_fornecedores():
-    msg = ''
-    data = []
-    try:
-        cursor = connection.cursor()
-        cursor.execute("SELECT Nome_Fornecedor, CNPJ, Contato from Fornecedor")
-        dadosFornecedor = cursor.fetchall()
-        print(dadosFornecedor)
-        data = [list(item) for item in dadosFornecedor]
-        dicionarioFornecedor = {'data':data}
-        print(dicionarioFornecedor)
-        return dicionarioFornecedor
-    except mysql.connector.Error as err:
-        msg ='Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)
-        return render_template('fornecedor.html',msg = msg)
+# @app.route('/buscar_fornecedores', methods=['GET','POST'])
+# def buscar_fornecedores():
+#     if 'loggedin' in session:
+
+#     except mysql.connector.Error as err:
+#         msg ='Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)
+#         return render_template('fornecedor.html',msg = msg)
 
 
-@app.route('/alterarFornecedor/',methods=['GET','POST'])
-def AlteraFornecedor():
+@app.route('/alterarFornecedor/<id>',methods=['GET','POST'])
+def AlteraFornecedor(id):
     if 'loggedin' in session:
-        
-        return render_template('alterarfornecedor.html')
+        dados = buscaPorIdFornecedor(id)
+        return render_template('alterar_Fornecedor.html', dadosFornecedor = dados,
+                                username=session['username'],
+                                loggedin=session['loggedin'],
+                                breadcrumb='Consultar Fornecedores',
+                                page_header='Menu de Consulta')
+    return redirect(url_for('login'))
 
+@app.route('/alterar', methods=['POST'])
+def alterar_fornecedor():
+    if request.method == 'POST':
+        idFornecedor = request.form['idFornecedor']
+        nomeFornecedor = request.form['Nome_Fornecedor']
+        cnpj = request.form['CNPJ']
+        contato = request.form['Contato']
+        try:
+            AtualizaFornecedor(idFornecedor, nomeFornecedor, cnpj, contato)
+            return redirect(url_for('AlteraFornecedor',id = idFornecedor))
+        except mysql.connector.Error as err:
+            msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)
+            return redirect(url_for('AlteraFornecedor'))
 
-def ListarFornecedores():
+def ListaFornecedores():
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM Fornecedor")
-    fornecedores = cursor.fetchall()
-    print (fornecedores[0])
-    print (type(fornecedores))
-    return fornecedores
+    cursor.execute("SELECT idFornecedor, Nome_Fornecedor, CNPJ, Contato from Fornecedor")
+    dadosFornecedor = cursor.fetchall()
+    print(dadosFornecedor)
+    data = [list(item) for item in dadosFornecedor]
+    return data
+
+def buscaPorIdFornecedor(id):
+    cursor = connection.cursor()
+    cursor.execute('SELECT idFornecedor, Nome_Fornecedor, CNPJ, Contato from Fornecedor where idFornecedor = %s',(id,))
+    data = cursor.fetchone()
+    return data
+
+def AtualizaFornecedor(id, nome, cnpj, contato):
+    cursor = connection.cursor()
+    cursor.execute('update Fornecedor\
+                    set \
+                        Nome_Fornecedor = %s,\
+                        CNPJ = %s,\
+                        Contato = %s\
+                    where idFornecedor = %s',(nome,cnpj,contato,id))
+    connection.commit()
+    

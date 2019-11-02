@@ -40,27 +40,28 @@
                 <table id='ListaFornecedores' class='display'>
                     <thead>
                         <tr>
+                            <th>Alterar ID</th>
                             <th>NomeFornecedor</th>
                             <th>CNPJ</th>
                             <th>Contato</th>
                         </tr>
                     </thead>
+                    <tbody>
+                        {% for fornecedor in fornecedores %}
+                            <tr>
+                                <td><a href="{{ url_for('AlteraFornecedor', id = fornecedor[0]) }}"> {{ fornecedor[0] }} </a></td>
+                                <td>{{ fornecedor[1] }}</td>
+                                <td>{{ fornecedor[2] }}</td>
+                                <td>{{ fornecedor[3] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
                 </table>
             </div>
         </div>
         <script>
             $(document).ready(function(){
-                $('#ListaFornecedores').DataTable( {
-                    "scrollY":        "250px",
-                    "scrollCollapse": true,
-                    "paging":         false,
-                    "ajax": "{{ url_for('buscar_fornecedores') }}",
-                    "column": [
-                        { "data": "NomeFornecedor" },
-                        { "data": "CNPJ" },
-                        { "data": "Contato"}
-                    ]
-                });
+                $('#ListaFornecedores').DataTable();
             })
         </script>
 
