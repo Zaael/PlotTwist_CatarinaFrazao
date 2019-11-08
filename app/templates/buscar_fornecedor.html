@@ -44,6 +44,7 @@
                             <th>NomeFornecedor</th>
                             <th>CNPJ</th>
                             <th>Contato</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -53,12 +54,56 @@
                                 <td>{{ fornecedor[1] }}</td>
                                 <td>{{ fornecedor[2] }}</td>
                                 <td>{{ fornecedor[3] }}</td>
+                                <td>    
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalAlteraFornecedor{{ fornecedor[0] }}">
+                                        Alterar
+                                    </button>
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
+        {% for fornecedor in fornecedores %}
+        <div class="modal fade" id="ModalAlteraFornecedor{{ fornecedor[0] }}">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">                        
+                        <div class="modal-header">
+                            <h4 class="modal-title">Alteração de Fornecedor</h4>
+                            <button type="button" class="close" data-dismiss="modal">
+                                &times;
+                            </button>
+                        </div>                
+                        <div class="modal-body mx-3">
+                            <form role="form" method="POST" action="{{ url_for('alterar_fornecedor') }}">            
+                            <div class="invisible md-form mb-5">
+                                <label for="idFornecedor" data-error="wrong" data-success="right">Id</label>
+                                <input value="{{ fornecedor[0] }}" class="form-control validate" name="idFornecedor" id="idFornecedor" required >
+                            </div>
+                            <div class="md-form mb-5">
+                                <label>Nome Fornecedor</label>
+                                <input value="{{ fornecedor[1] }}" type="text" class="form-control" name="Nome_Fornecedor" id="Nome_Fornecedor"  required>
+                            </div>
+                            <div class="md-form mb-5">
+                                <label>CNPJ</label>
+                                <input value="{{ fornecedor[2] }}" type="text" class="form-control" name="CNPJ" id="CNPJ"  required>
+                            </div>
+                            <div class="md-form mb-5">
+                                <label>Contato</label>
+                                <input value="{{ fornecedor[3] }}" type="text" class="form-control" name="Contato" id="Contato"  required>
+                            </div>
+                            <button type="submit"  class="btn btn-success">Salvar</button>
+                        </form>
+                        </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                          </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% endfor %}
         <script>
             $(document).ready(function(){
                 $('#ListaFornecedores').DataTable();

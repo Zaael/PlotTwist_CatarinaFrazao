@@ -81,16 +81,18 @@ def AlteraFornecedor(id):
 @app.route('/alterar', methods=['POST'])
 def alterar_fornecedor():
     if request.method == 'POST':
+        print('ops')
         idFornecedor = request.form['idFornecedor']
         nomeFornecedor = request.form['Nome_Fornecedor']
         cnpj = request.form['CNPJ']
         contato = request.form['Contato']
         try:
             AtualizaFornecedor(idFornecedor, nomeFornecedor, cnpj, contato)
-            return redirect(url_for('AlteraFornecedor',id = idFornecedor))
+            print('boa')
+            return redirect(url_for('buscar'))
         except mysql.connector.Error as err:
             msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)
-            return redirect(url_for('AlteraFornecedor'))
+            return redirect(url_for('buscar'))
 
 def ListaFornecedores():
     cursor = connection.cursor()
