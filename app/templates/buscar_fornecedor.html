@@ -45,19 +45,26 @@
                             <th>CNPJ</th>
                             <th>Contato</th>
                             <th>Ações</th>
+                            <!-- <th>Deletar</th> -->
                         </tr>
                     </thead>
                     <tbody>
                         {% for fornecedor in fornecedores %}
                             <tr>
-                                <td><a href="{{ url_for('AlteraFornecedor', id = fornecedor[0]) }}"> {{ fornecedor[0] }} </a></td>
+                                <td>{{ fornecedor[0] }}</td>
                                 <td>{{ fornecedor[1] }}</td>
                                 <td>{{ fornecedor[2] }}</td>
                                 <td>{{ fornecedor[3] }}</td>
-                                <td>    
-                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalAlteraFornecedor{{ fornecedor[0] }}">
-                                        Alterar
-                                    </button>
+                                <td> 
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalAlteraFornecedor{{ fornecedor[0] }}">
+                                            Alterar
+                                        </button>
+
+                                        <button type="button" class="btn btn-danger deletar" id="Delete" value="{{ fornecedor[0] }}">
+                                                Deletar
+                                        </button>
+                                    </div> 
                                 </td>
                             </tr>
                         {% endfor %}
@@ -107,6 +114,26 @@
         <script>
             $(document).ready(function(){
                 $('#ListaFornecedores').DataTable();
+                $('.deletar').click(function(){
+                    var idFornecedor = $(this).val()
+                    Swal.fire({
+                        icon: 'warning',
+                        tittle: 'Exclusão de Forncecedor',
+                        text: 'Você tem certeza que deseja excluir?',
+                        showCancelButton: true,
+                        confirmButtonText: 'Excluir!',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.value){
+                            var deletar = "{{ url_for('deletar_fornecedor', id = idFornecedor) }}"
+                            Swal.fire(
+                                'Deletedao!',
+                                'O fornecedor foi cancelado.',
+                                'Sucesso!'
+                            )
+                        }
+                    })
+                });
             })
         </script>
 
