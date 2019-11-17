@@ -49,21 +49,35 @@
 
 
 <script>
-    
+/*
 var editor; // use a global for the submit and return data rendering in the examples
  
- $(document).ready(function() {
-     editor = new $.fn.dataTable.Editor( {
+$(document).ready(function() {
+    editor = new $.fn.dataTable.Editor( {
+        "ajax": "{{ url_for('consultar_cliente') }}",
 
-
+        table: "#listar-cliente",
+        fields: [ {
+                label: "Nome:",
+                name: "Nome"
+            }, {
+                label: "CPF:",
+                name: "CPF"
+            }, {
+                label: "Celular:", 
+                name: "Celular"
+            }, {
+                label: "Email:",
+                name: "Email"
+            }, 
+        ]
      } );
   
      $('#listar-cliente').DataTable( {
-         dom: "Bfrtip",
+            dom: "Bfrtip",
             "scrollY":        "250px",
             "scrollCollapse": true,
             "paging":         false,
-            "ajax": "{{ url_for('consultar_cliente') }}",
 
          select: true,
          buttons: [
@@ -73,18 +87,27 @@ var editor; // use a global for the submit and return data rendering in the exam
          ]
      } );
  } );
+*/
 
-
-        /*    $(document).ready(function() {
+            $(document).ready(function() {
                 $('#listar-cliente').DataTable( {
+                    
                     "scrollY":        "250px",
                     "scrollCollapse": true,
                     "paging":         false,
                     "ajax": "{{ url_for('consultar_cliente') }}",
-
+                    dom: 'Bfrtip',
+        buttons: [
+            {
+                text: 'My button',
+                action: function ( e, dt, node, config ) {
+                    alert( 'Button activated' );
+                }
+            }
+        ]
                 } );
             } );
-            */
+            
             </script>
 
 {% endblock %}

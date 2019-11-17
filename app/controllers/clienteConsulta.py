@@ -7,7 +7,6 @@ import json
 
 connection = db.db_connection()
 
-
 @app.route('/consulta', methods=['GET', 'POST'])
 def redirecionarConsulta(mensagem = 'teste'):
     msg = mensagem
