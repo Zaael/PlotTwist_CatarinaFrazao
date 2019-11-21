@@ -21,34 +21,32 @@ def cliente_inicio():
     return redirect(url_for('login'))
 
 
-@app.route('/buscar_cliente',methods=['GET','POST'])
-def buscar_cliente():
+@app.route('/cliente',methods=['GET','POST'])
+def cliente():
     if 'loggedin' in session:
         clientes = listaCliente()
-        return render_template('clientes-consulta.html', clientes= clientes,
+        return render_template('clientes.html', clientes= clientes,
                                 username=session['username'],
                                 loggedin=session['loggedin'],
-                                breadcrumb='Consultar clientes',
-                                page_header='Menu de Consulta')
+                                breadcrumb='Clientes',
+                                page_header='Ações em Clientes')
     return redirect(url_for('login'))
 
 
 @app.route('/criar_cliente', methods=['GET','POST'])
 def criar_cliente():
     if  request.method == 'POST':
-        NomeCliente = request.form['Nomecliente']
+        NomeCliente = request.form['NomeCliente']
         CPFCliente = request.form['CPF']
         CelularCliente = request.form['Celular']
         EmailCliente = request.form['Email']
         try:
-            cursor = connection.cursor()
-            cursor.execute('INSERT INTO cliente (Nome, CPF, Celular, Email) VALUES (%s, %s, %s, %s)',(NomeCliente, CPFCliente, CelularCliente, EmailCliente))
-            connection.commit()
+            criaCliente(NomeCliente, CPFCliente, CelularCliente, EmailCliente)
             msg = 'Cadastro de cliente realizado com sucesso!'
-            return redirect(url_for('cadastro_cliente'))
+            return redirect(url_for('cliente'))
         except mysql.connector.Error as err:
             msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)
-            return redirect(url_for('cadastro_cliente'))
+            return redirect(url_for('cliente'))
 
 
 @app.route('/alterar_cliente', methods=['POST'])
@@ -61,10 +59,10 @@ def alterar_cliente():
         Email = request.form['Email']
         try:
             atualizaCliente(idcliente, NomeCliente, CPF, Celular, Email)
-            return redirect(url_for('buscar_cliente'))
+            return redirect(url_for('cliente'))
         except mysql.connector.Error as err:
             msg = 'Erro ao realizar alteração. Erro: {}'.format(err)
-            return redirect(url_for('buscar_cliente'))
+            return redirect(url_for('cliente'))
 
 @app.route('/deletar_cliente', methods=['GET','POST'])
 def deletar_cliente():
@@ -72,10 +70,10 @@ def deletar_cliente():
         idcliente = request.form['id']
         try:
             deletarCliente(idcliente)
-            return redirect(url_for('buscar_cliente'))
+            return redirect(url_for('cliente'))
         except mysql.connector.Error as err:
             msg = 'Ops! Algo deu errado. Tente novamente. Erro: {}'.format(err)
-            return redirect(url_for('buscar_cliente'))
+            return redirect(url_for('cliente'))
 
 
 def listaCliente():
@@ -97,9 +95,11 @@ def atualizaCliente(id, nome, CPF, Celular, Email):
     connection.commit()
 
 def deletarCliente(id):
-    delid = id
     cursor = connection.cursor()
-    print(delid)
-    cursor.execute('DELETE FROM cliente WHERE idcliente = %s' % delid)
-    print('foi')
+    cursor.execute('DELETE FROM cliente WHERE idcliente = %s' % id)
+    connection.commit()
+
+def criaCliente(nome, CPF, Celular, Email):
+    cursor = connection.cursor()
+    cursor.execute('INSERT INTO cliente (Nome, CPF, Celular, Email) VALUES (%s, %s, %s, %s)',(nome, CPF, Celular, Email))
     connection.commit()
