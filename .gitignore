@@ -1,0 +1,6 @@
+venv
+__pychache__
+.vscode/settings.json
+app/__pycache__/
+app/services/__pycache__/
+app/controllers/__pycache__
