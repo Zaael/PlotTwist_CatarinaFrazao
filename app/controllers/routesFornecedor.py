@@ -73,9 +73,10 @@ def alterar_fornecedor():
             return redirect(url_for('buscar'))
 
 @app.route('/deletar', methods=['POST'])
-def deletar_fornecedor(id):
+def deletar_fornecedor():
     if request.method == 'POST':
         idFornecedor = request.form['idFornecedor']
+        print(idFornecedor)
         try:
             deletarFornecedor(idFornecedor)
             return redirect(url_for('buscar'))
@@ -104,5 +105,5 @@ def AtualizaFornecedor(id, nome, cnpj, contato):
 
 def deletarFornecedor(id):
     cursor = connection.cursor()
-    cursor.execute('DELETE FROM Fornecedores WHERE idFornecedor = %s',(id,))
+    cursor.execute('DELETE FROM Fornecedor WHERE idFornecedor = %s',(id))
     connection.commit()

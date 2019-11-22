@@ -61,8 +61,8 @@
                                             Alterar
                                         </button>
 
-                                        <button type="button" class="btn btn-danger deletar" id="Delete" value="{{ fornecedor[0] }}">
-                                                Deletar
+                                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#ModalDeletaFornecedor{{ fornecedor[0] }}">
+                                            Deletar
                                         </button>
                                     </div> 
                                 </td>
@@ -108,32 +108,37 @@
                           </div>
                     </div>
                 </div>
+        </div>
+        <div class="modal fade" id="ModalDeletaFornecedor{{ fornecedor[0] }}">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">                        
+                    <div class="modal-header">
+                        <h4 class="modal-title">Deletar Fornecedor</h4>
+                        <button type="button" class="close" data-dismiss="modal">
+                            &times;
+                        </button>
+                    </div>                
+                    <div class="modal-body mx-3">
+                        <h3>
+                            Você tem certeza que deseja excluir?
+                        </h3>
+                        <form role="form" method="POST" action="{{ url_for('deletar_fornecedor') }}">
+                            <div class="invisible md-form mb-5">
+                                <label for="idFornecedor" data-error="wrong" data-success="right">Id</label>
+                                <input value="{{ fornecedor[0] }}" class="form-control validate" name="idFornecedor" id="idFornecedor" required >
+                            </div>
+                            <button type="submit"  class="btn btn-success">Excluir</button>
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        </form>
+                    </div>
+                </div>
             </div>
+        </div>
             
             {% endfor %}
         <script>
             $(document).ready(function(){
-                $('#ListaFornecedores').DataTable();
-                $('.deletar').click(function(){
-                    var idFornecedor = $(this).val()
-                    Swal.fire({
-                        icon: 'warning',
-                        tittle: 'Exclusão de Forncecedor',
-                        text: 'Você tem certeza que deseja excluir?',
-                        showCancelButton: true,
-                        confirmButtonText: 'Excluir!',
-                        cancelButtonText: 'Cancelar'
-                    }).then((result) => {
-                        if (result.value){
-                            var deletar = "{{ url_for('deletar_fornecedor', id = idFornecedor) }}"
-                            Swal.fire(
-                                'Deletedao!',
-                                'O fornecedor foi cancelado.',
-                                'Sucesso!'
-                            )
-                        }
-                    })
-                });
+                $('#ListaFornecedores').DataTable();                
             })
         </script>
 
