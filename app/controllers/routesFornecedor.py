@@ -10,26 +10,16 @@ from app.controllers import home
 
 connection = db.db_connection()
 
-@app.route('/fornecedor/')
-def fornecedor():
+@app.route('/fornecedores',methods=['GET','POST'])
+def fornecedores():
     if 'loggedin' in session:
-        return render_template('fornecedor.html',
+        fornecedores = ListaFornecedores()
+        return render_template('fornecedores.html', fornecedores= fornecedores,
                                 username=session['username'],
                                 loggedin=session['loggedin'],
-                                breadcrumb='Fornecedor',
-                                page_header ='Menu de Navegação')
+                                breadcrumb='Consultar Fornecedores',
+                                page_header='Fornecedores')
     return redirect(url_for('login'))
-
-@app.route('/cadastro_fornecedor', methods=['GET', 'POST'])
-def cadastro_fornecedor():
-    if 'loggedin' in session:
-        return render_template('cadastro-fornecedor.html',
-                                username=session['username'],
-                                loggedin=session['loggedin'],
-                                breadcrumb='Cadastro Fornecedor',
-                                page_header='Menu de Cadastro')
-    return redirect(url_for('login'))
-
 
 @app.route('/criar_fornecedor', methods=['GET','POST'])
 def criar_fornecedor():
@@ -42,21 +32,10 @@ def criar_fornecedor():
             cursor.execute('INSERT INTO Fornecedor (nome_Fornecedor, CNPJ, Contato) VALUES (%s, %s, %s)',(nomeFornecedor,cnpj,contato))
             connection.commit()
             msg = 'Cadastro de Fornecedor realizado com sucesso!'
-            return redirect(url_for('cadastro_fornecedor'))
+            return redirect(url_for('fornecedores'))
         except mysql.connector.Error as err:
             msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)
-            return redirect(url_for('cadastro_fornecedor'))
-
-@app.route('/buscar',methods=['GET','POST'])
-def buscar():
-    if 'loggedin' in session:
-        fornecedores = ListaFornecedores()
-        return render_template('buscar_fornecedor.html', fornecedores= fornecedores,
-                                username=session['username'],
-                                loggedin=session['loggedin'],
-                                breadcrumb='Consultar Fornecedores',
-                                page_header='Menu de Consulta')
-    return redirect(url_for('login'))
+            return redirect(url_for('fornecedores'))
 
 @app.route('/alterar', methods=['POST'])
 def alterar_fornecedor():
@@ -67,22 +46,22 @@ def alterar_fornecedor():
         contato = request.form['Contato']
         try:
             AtualizaFornecedor(idFornecedor, nomeFornecedor, cnpj, contato)
-            return redirect(url_for('buscar'))
+            return redirect(url_for('fornecedores'))
         except mysql.connector.Error as err:
             msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)
-            return redirect(url_for('buscar'))
+            return redirect(url_for('fornecedores'))
 
-@app.route('/deletar', methods=['POST'])
+@app.route('/deletar_fornecedor', methods=['GET','POST'])
 def deletar_fornecedor():
     if request.method == 'POST':
-        idFornecedor = request.form['idFornecedor']
+        idFornecedor = request.form['id']
         print(idFornecedor)
         try:
             deletarFornecedor(idFornecedor)
-            return redirect(url_for('buscar'))
+            return redirect(url_for('fornecedores'))
         except mysql.connector.Error as err:
             msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)
-            return redirect(url_for('buscar'))
+            return redirect(url_for('fornecedores'))
 
 
 def ListaFornecedores():
@@ -105,5 +84,5 @@ def AtualizaFornecedor(id, nome, cnpj, contato):
 
 def deletarFornecedor(id):
     cursor = connection.cursor()
-    cursor.execute('DELETE FROM Fornecedor WHERE idFornecedor = %s',(id))
+    cursor.execute('DELETE FROM Fornecedor WHERE idFornecedor = %s' %id)
     connection.commit()

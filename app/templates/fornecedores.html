@@ -1,0 +1,191 @@
+{% extends 'base-template.html' %}
+
+{% block title %} Fornecedores {% endblock %}
+
+{% if loggedin %} 
+
+{% block breadcrumb %}	
+
+    {% if breadcrumb %}
+    <div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
+    <div class="row">
+        <ol class="breadcrumb">
+            <li><a href="#">
+                <em class="fa fa-home"></em>
+            </a></li>
+            <li class="active">{{breadcrumb}}</li>
+        </ol>
+    </div>
+    <!--/.row-->
+    {% endif %} <!--/endif breadcrumb-->
+    {% endblock %}
+
+{% block page_header %}
+
+    {% if page_header %}
+    <div class="row">
+        <div class="col-lg-12">
+            <h3 class="page-header">{{page_header}}</h3>
+        </div>
+    </div><!--/.row-->
+    {% endif %} <!--/endif page_header-->
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <button type="button" class="btn btn-success" id="Adicionar" data-toggle="modal" data-target="#ModalAdicionaFornecedor">
+            Adicionar
+        </button>    
+    </div>
+</div>
+<div class="col"> 
+    <br>
+    <table id='ListaFornecedores' class='display'>
+        <thead>
+            <tr>
+                <th>Alterar ID</th>
+                <th>NomeFornecedor</th>
+                <th>CNPJ</th>
+                <th>Contato</th>
+                <th>Ações</th>                            
+            </tr>
+        </thead>
+        <tbody>
+            {% for fornecedor in fornecedores %}
+            <tr>
+                <td>{{ fornecedor[0] }}</td>
+                <td>{{ fornecedor[1] }}</td>
+                <td>{{ fornecedor[2] }}</td>
+                <td>{{ fornecedor[3] }}</td>
+                <td> 
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary mr-5" data-toggle="modal" data-target="#ModalAlteraFornecedor{{ fornecedor[0] }}">
+                            Alterar
+                        </button>
+                        <button type="button" class="btn btn-danger deletar" id="Delete" value="{{ fornecedor[0] }}">
+                            Deletar
+                        </button>
+                    </div> 
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+    {% for fornecedor in fornecedores %}
+    <div class="modal fade" id="ModalAlteraFornecedor{{ fornecedor[0] }}">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">                        
+                <div class="modal-header">
+                    <h4 class="modal-title">Alteração de Fornecedor</h4>
+                    <button type="button" class="close" data-dismiss="modal">
+                        &times;
+                    </button>
+                </div>                
+                <div class="modal-body mx-3">
+                    <form role="form" method="POST" action="{{ url_for('alterar_fornecedor') }}">            
+                    <div class="md-form mb-5">
+                        <label for="idFornecedor" data-error="wrong" data-success="right">Id</label>
+                        <input value="{{ fornecedor[0] }}" class="form-control validate" name="idFornecedor" id="idFornecedor" readonly >
+                    </div>
+                    <div class="md-form mb-5">
+                        <label>Nome Fornecedor</label>
+                        <input value="{{ fornecedor[1] }}" type="text" class="form-control" name="Nome_Fornecedor" id="Nome_Fornecedor"  required>
+                    </div>
+                    <div class="md-form mb-5">
+                        <label>CNPJ</label>
+                        <input value="{{ fornecedor[2] }}" type="text" class="form-control" name="CNPJ" id="CNPJ"  required>
+                    </div>
+                    <div class="md-form mb-5">
+                        <label>Contato</label>
+                        <input value="{{ fornecedor[3] }}" type="text" class="form-control" name="Contato" id="Contato"  required>
+                    </div>
+                    <br>
+                    <button type="submit"  class="btn btn-success">Salvar</button>
+                    
+                </form>
+                </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                  </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="ModalAdicionaFornecedor">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">                        
+                    <div class="modal-header">
+                        <h4 class="modal-title">Novo Fornecedor</h4>
+                        <button type="button" class="close" data-dismiss="modal">
+                            &times;
+                        </button>
+                    </div>                
+                    <div class="modal-body mx-3">
+                        <form role="form" method="POST" action="{{ url_for('criar_fornecedor') }}">            
+                        <div class="md-form mb-5">
+                            <label for="idFornecedor" data-error="wrong" data-success="right">Id</label>
+                            <input value="" class="form-control validate" name="idFornecedor" id="idFornecedor" readonly >
+                        </div>
+                        <div class="md-form mb-5">
+                            <label>Nome Fornecedor</label>
+                            <input value="" type="text" class="form-control" name="Nome_Fornecedor" id="Nome_Fornecedor"  required>
+                        </div>
+                        <div class="md-form mb-5">
+                            <label>CNPJ</label>
+                            <input value="" type="text" class="form-control" name="CNPJ" id="CNPJ"  required>
+                        </div>
+                        <div class="md-form mb-5">
+                            <label>Contato</label>
+                            <input value="" type="text" class="form-control" name="Contato" id="Contato"  required>
+                        </div>
+
+                        <br>
+                        <button type="submit"  class="btn btn-success">Salvar</button>
+
+                    </form>
+                    </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                      </div>
+                </div>
+            </div>
+    </div>
+    {% endfor %}
+
+<script>
+    $(document).ready(function(){
+        $('#ListaFornecedores').DataTable(); 
+        $('.deletar').click(function(){
+            var idFornecedor = $(this).val()
+            Swal.fire({
+                icon: 'warning',
+                tittle: 'Tem certeza?',
+                text: 'Este processo não pode ser desfeito!',
+                showCancelButton: true,
+                confirmButtonText: 'Excluir!',
+                cancelButtonText: 'Cancelar!',
+                preConfirm: () => $.post('deletar_fornecedor', {id: idFornecedor})
+            }).then((result) => {
+                if (result.value){
+                    Swal.fire({
+                        title: 'Deletado!',
+                        icon:'success',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+                    // $.post('deletar_fornecedor', {id: idFornecedor})
+                }
+            })
+        })               
+    })
+</script>
+
+{% endblock %}
+
+{% endif %}
+
+
+
