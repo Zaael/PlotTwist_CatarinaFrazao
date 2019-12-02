@@ -78,14 +78,14 @@ def deletar_cliente():
 
 def listaCliente():
     cursor = connection.cursor()
-    cursor.execute("SELECT idCliente, Nome, CPF, Celular, Email from cliente")
+    cursor.execute("SELECT idCliente, CPF, Nome, Celular, Email from cliente")
     dadoscliente = cursor.fetchall()
     data = [list(item) for item in dadoscliente]
     return data
 
 def buscaPorIdCliente(id):
     cursor = connection.cursor()
-    cursor.execute('SELECT idCliente, Nome, CPF, Celular, Email FROM cliente WHERE idcliente = %s',(id))
+    cursor.execute('SELECT idCliente, CPF, Nome, Celular, Email FROM cliente WHERE idcliente = %s',(id))
     data = cursor.fetchone()
     return data
 
@@ -96,7 +96,7 @@ def atualizaCliente(id, nome, CPF, Celular, Email):
 
 def deletarCliente(id):
     cursor = connection.cursor()
-    cursor.execute('DELETE FROM cliente WHERE idcliente = %s' % id)
+    cursor.execute('DELETE FROM cliente WHERE idCliente = %s' % id)
     connection.commit()
 
 def criaCliente(nome, CPF, Celular, Email):
