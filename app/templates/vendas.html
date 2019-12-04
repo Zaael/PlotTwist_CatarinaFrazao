@@ -1,0 +1,259 @@
+{% extends 'base-template.html' %}
+
+{% block title %} Vendas {% endblock %}
+
+{% if loggedin %} 
+
+{% block breadcrumb %}	
+
+    {% if breadcrumb %}
+    <div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
+    <div class="row">
+        <ol class="breadcrumb">
+            <li><a href="#">
+                <em class="fa fa-home"></em>
+            </a></li>
+            <li class="active">{{breadcrumb}}</li>
+        </ol>
+    </div>
+    <!--/.row-->
+    {% endif %} <!--/endif breadcrumb-->
+    {% endblock %}
+
+{% block page_header %}
+
+    {% if page_header %}
+    <div class="row">
+        <div class="col-lg-12">
+            <h3 class="page-header">{{page_header}}</h3>
+        </div>
+    </div><!--/.row-->
+    {% endif %} <!--/endif page_header-->
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <button type="button" class="btn btn-success" id="Adicionar" data-toggle="modal" data-target="#ModalNovoPedido">
+            Novo Pedido
+        </button>    
+    </div>
+</div>
+<div class="col"> 
+    <br>
+    <table id='ListaPedidos' class='display'>
+        <thead>
+            <tr>
+                <th>IdCliente</th>
+                <th>IdUsuario</th>
+                <th>Data do Pedido</th>
+                <th>Hora do Pedido</th>
+                <th>Ações</th>                            
+            </tr>
+        </thead>
+        <tbody>
+            {% for pedido in pedidos %}
+            <tr>
+                <td>{{ pedido[0] }}</td>
+                <td>{{ pedido[1] }}</td>
+                <td>{{ pedido[2] }}</td>
+                <td>{{ pedido[3] }}</td>
+                <td> 
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary mr-5" data-toggle="modal" data-target="#ModalDetalhesPedido{{ pedido[0] }}">
+                            Detalhes
+                        </button>
+                        <button type="button" class="btn btn-danger deletar" id="Delete" value="{{ pedido[0] }}">
+                            Deletar
+                        </button>
+                    </div> 
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+{% for pedido in pedidos %}
+<div class="modal fade" id="ModalNovoPedido">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">                        
+            <div class="modal-header">
+                <h4 class="modal-title">Realização de Pedido</h4>
+                <button type="button" class="close" data-dismiss="modal">
+                    &times;
+                </button>
+            </div>                
+            <div class="modal-body mx-3">
+                <form role="form" method="POST" action="{{ url_for('AdicionaPedido') }}">
+                    <div class="form-row">
+                        <div class="md-form mb-5">
+                            <label for="" data-error="wrong" data-success="right">Cliente</label>
+                            <select name="Cliente" id="Cliente" class="js-example-basic form-control custom-select" style="width: 100%;">
+                                {% for cliente in Clientes %}
+                                    <option value="{{ cliente[0] }}">{{ cliente[0] }} - {{cliente[1] }} - {{cliente[2] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="md-form mb-5">
+                            <label>Usuario Logado</label>
+                            <input name="idUsuario" id="idUsuario" value="{{ username }}" readonly required type="text" class="form-control"  id="usuario_logado" >
+                        </div>
+                        <br>
+                        <button type="button" id="GravaPedido" class="btn btn-success" >Salvar</button>
+                    </div>
+                    <br>
+                    <div class="form-row">
+                        <div class="md-form mb-5">
+                            <label for="" data-error="wrong" data-success="right">Produto</label>
+                                <select disabled name="Produto" id="ProdutoPedido" class="js-example-basic form-control custom-select" style="width: 100%;">
+                                    {% for produto in Produtos %}
+                                    <option value="{{ produto[0] }}">{{ produto[0] }} - {{produto[1] }} - {{produto[2] }} - {{produto[3] }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="md-form mb-5">
+                                <label>Quantidade</label>
+                                <input name="QuantidadePedido" value="0" disabled required type="number" class="form-control"  id="QuantidadePedido" style="width: 15%;" >
+                            </div>
+                            <div class="md-form mb-4">
+                                <label>Quantidade Disponível</label>
+                                <input name="QuantidadeDisponivelPedido" value="" readonly required type="number" class="form-control"  id="QuantidadeDisponivelPedido" style="width: 15%;" >
+                            </div>
+                            <div class="md-form mb-4">
+                                    <label>Preço</label>
+                                    <input name="PrecoProduto" value="" readonly required type="numeric" class="form-control"  id="PrecoProduto" style="width: 15%;" >
+                            </div>
+                            <div class="md-form mb-4">
+                                    <label>Valor</label>
+                                    <input name="ValorTotalProduto" value="" readonly required type="numeric" class="form-control"  id="ValorTotalProduto" style="width: 15%;" >
+                            </div>
+                            <br>
+                        <button type="button" class="btn btn-success" disabled id="AdicionaProdutos">Adicionar Produto</button>
+                    </div>
+                    <br>
+                    <div class="form-row">
+                        <table class="table table-striped" id="ProdutosPedido">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th scope="col"> IdProduto </th>
+                                    <th scope="col"> Descrição do produto </th>
+                                    <th scope="col"> Marca do produto </th>
+                                    <th scope="col"> Cor do produto </th>
+                                    <th scope="col"> Quantidade </th>
+                                    <th scope="col"> Preço </th>
+                                    <th scope="col"> Total por Produto</th>
+                                    <th scope="col"> Remover</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="md-form mb-4">
+                            <label>Desconto em %</label>
+                            <input name="DescontoPedido" value="" disabled required type="number" class="form-control"  id="DescontoPedido" style="width: 15%;" >
+                    </div>
+                    <div class="md-form mb-4">
+                            <label>Valor Final</label>
+                            <input name="ValorTotalPedido" value="" readonly required type="numeric" class="form-control"  id="ValorTotalPedido" style="width: 15%;" >
+                    </div>
+                </form>
+
+
+
+            </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+              </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<script>
+    $(document).ready(function(){
+        var IdCliente = $('#Cliente').val();
+        var IdUsuario = $('#idUsuario').val();
+        var IdProduto = '';
+        var descricao = '';
+        var Marca = '';
+        var Cor = '';
+        var Preco = '';
+        var Quantidade ='';
+
+        $('#ListaPedidos').DataTable();
+        $('.js-example-basic').select2();
+        $('#GravaPedido').click(function(){
+            $('#ProdutoPedido').prop("disabled", false);
+            $('#QuantidadePedido').prop("disabled", false);
+            $('#AdicionaProdutos').prop("disabled", false);
+            $('#Cliente').prop("disabled", true);
+        })
+        $('#ProdutoPedido').change(function(){
+            var id = $(this).val();
+            $.post("GetProduto",{id:id}, function(data){
+
+                IdProduto = data[0];
+                descricao = data[1];
+                Marca = data[2];
+                Cor = data[3];
+                Preco = data[6];
+                Quantidade = data[7]
+
+                $('#QuantidadeDisponivelPedido').val(Quantidade);
+                $('#PrecoProduto').val(Preco);
+            })
+        })
+        $('#QuantidadePedido').focusout(function(){
+            var QuantidadeAtual = $(this).val();
+            if(QuantidadeAtual >= 0 && QuantidadeAtual <= $('#QuantidadeDisponivelPedido').val()){
+                var total = $('#PrecoProduto').val() * QuantidadeAtual
+                $('#ValorTotalProduto').val(total);
+            }
+            else{
+                alert('Quantidade maior do que a Disponível!');
+            }
+        })
+
+        $('#AdicionaProdutos').click(function(){
+            if ($('#ValorTotalProduto').val() != 0 && $('#ValorTotalProduto').val() !='' && $('#QuantidadePedido').val() != 0 && $('#QuantidadePedido').val() != '') {
+                var newRow = $("<tr>");
+                var cols = "";	
+                cols += '<td>'+ IdProduto +'</td>';
+                cols += '<td>'+ descricao +'</td>';
+                cols += '<td>'+ Marca +'</td>';
+                cols += '<td>'+ Cor +'</td>';
+                cols += '<td>'+ $('#QuantidadePedido').val() +'</td>';
+                cols += '<td>'+ $('#PrecoProduto').val() +'</td>';
+                cols += '<td class="valorTotalSoma">'+ $('#ValorTotalProduto').val() +'</td>';
+                cols += '<td>';
+                cols += '<button onclick="RemoveTableRow(this)" type="button">Remover</button>';
+                cols += '</td>';
+                newRow.append(cols);
+                $("#ProdutosPedido").append(newRow);
+
+                $('#ProdutoPedido').focus();
+                $('#QuantidadePedido').val(0);
+                $('#QuantidadeDisponivelPedido').val("");
+                $('#PrecoProduto').val("");
+                $('#ValorTotalProduto').val("");
+
+                ValorFinal = 0;
+                $('.valorTotalSoma').each(function(){
+                    ValorFinal += parseFloat($(this).text());
+                });
+                AplicaDesconto = ValorFinal * ($('#DescontoPedido').val()/100);
+                $('#ValorTotalPedido').val(ValorFinal);
+
+                return false;
+            }
+        })
+
+    })
+    
+</script>
+
+{% endblock %}
+
+{% endif %}

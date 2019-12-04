@@ -2,9 +2,9 @@
 
 {% block title %} Produtos {% endblock %}
 
-{% if loggedin %} 
+{% if loggedin %}
 
-{% block breadcrumb %}	
+{% block breadcrumb %}
 
     {% if breadcrumb %}
     <div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
@@ -31,13 +31,222 @@
 {% endblock %}
 
 {% block content %}
-    <h5>O que deseja fazer?</h5>
-    <form>
-    <button type="submit" class="btn btn-lg btn-primary" formaction="{{ url_for('redirecionarProduto') }}">Cadastro</button>
-    <button type="submit" class="btn btn-lg btn-primary">Consulta</button>
-    <button type="submit" class="btn btn-lg btn-primary">Alteração</button>
-    </form>
+<div class="row">
+    <div class="col-md-4">
+        <button type="button" class="btn btn-success" id="Adicionar" data-toggle="modal" data-target="#ModalAdicionaProduto">
+            Adicionar
+        </button>    
+    </div>
+</div>
+<div class="col">
+    <br>
+    <table class="display" id="ListaProdutoItens">
+        <thead>
+            <tr>
+                <th>idProduto</th>
+                <th>Descrição</th>
+                <th>Marca</th>
+                <th>Cor</th>
+                <th>Material</th>
+                <th>Custo</th>
+                <th>Preço</th>
+                <th>Quantidade</th>
+                <th>Fornecedor</th>
+                <th>Ações</th>                
+            </tr>
+        </thead>
+        <tbody>
+        {% for produto in produtos %}
+            <tr>
+                <td>{{ produto[0] }}</td>
+                <td>{{ produto[1] }}</td>
+                <td>{{ produto[2] }}</td>
+                <td>{{ produto[3] }}</td>
+                <td>{{ produto[4] }}</td>
+                <td>{{ produto[5] }}</td>
+                <td>{{ produto[6] }}</td>
+                <td>{{ produto[7] }}</td>
+                <td>{{ produto[8] }}</td>
+                <td>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary mr-5" data-toggle="modal" data-target="#ModalAlterarProduto{{ produto[0] }}">
+                            Alterar
+                        </button>
+                        <button type="button" class="btn btn-danger deletar" id="Delete" value="{{ produto[0] }}">
+                            Deletar
+                        </button>
+                    </div> 
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+
+    <div class="modal fade" id="ModalAdicionaProduto">
+        <div class="modal-dialog modal-dialog-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Novo Produto</h4>
+                    <button type="button" class="close" data-dismiss="modal">
+                        &times;
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form role="form" method="POST" action="{{ url_for('criar_produto') }}">
+                        <div class="form-row">
+                            <div class="form-group mb-5">
+                                <label>Descrição</label>
+                                <input type="text" placeholder="Descrição" class="form-control" name="descricao">
+                            </div>
+                            <div class="form-group mb-5">
+                                <label>Marca</label>
+                                <select class="js-example-basic form-control custom-select" style="width: 100%;" name="Marca">
+                                {% for marca in marcas %}
+                                    <option value="{{ marca[0] }}">{{marca[1] }}</option>
+                                {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group mb-5">
+                                <label>Cor</label>
+                                <select class="js-example-basic form-control custom-select" style="width: 100%;" name="Cor">
+                                    {% for cor in cores %}
+                                    <option value="{{ cor[0] }}">{{ cor[1] }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group mb-5">
+                                <label>Material</label>
+                                <select class=" js-example-basic custom-select form-control" style="width: 100%;" name="Material">
+                                {% for material in materiais %}
+                                    <option value="{{ material[0] }}">{{ material[1] }}</option>
+                                {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group mb-5">
+                                <label>Fornecedor</label>
+                                    <select class=" js-example-basic custom-select form-control" style="width: 100%;" name="Fornecedor">
+                                    {% for fornecedor in fornecedores %}
+                                        <option value="{{ fornecedor[0] }}">{{ fornecedor[1] }}</option>
+                                    {% endfor %}
+                                    </select>
+                            </div>
+                            <div class="form-group mb-5">
+                                <label>Custo</label>
+                                <input type="number" placeholder="Custo" class="form-control" name="Custo">
+                            </div>
+                            <div class="form-group mb-5">
+                                <label>Preço</label>
+                                <input type="number" placeholder="Preço" class="form-control" name="Preco">
+                            </div>
+                            <div class="form-group mb-5">
+                                <label>Quantidade</label>
+                                <input type="number" placeholder="Quantidade" class="form-control" name="Quantidade">
+                            </div>
+                        </div> 
+                        <br>
+                        <button type="submit"  class="btn btn-success">Salvar</button>                 
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% for produto in produtos %}
+    <div class="modal fade" id="ModalAlterarProduto{{ produto[0] }}">
+        <div class="modal-dialog modal-dialog-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Novo Produto</h4>
+                    <button type="button" class="close" data-dismiss="modal">
+                        &times;
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form role="form" method="POST" action="{{ url_for('alterar_Produto') }}">
+                        <div class="form-row">
+                            <div class="form-group mb-5">
+                                <label>idProduto</label>
+                                <input type="text" value="{{produto[0] }}" readonly class="form-control" name="idProduto">
+                            </div>
+                            <div class="form-group mb-5">
+                                <label>Descrição</label>
+                                <input value="{{produto[1] }}" readonly type="text" placeholder="Descrição" class="form-control" name="descricao">
+                            </div>
+                            <div class="form-group mb-5">
+                                <label>Marca</label>
+                                <input value="{{produto[2] }}" readonly type="text" class="form-control">
+                            </div>
+                            <div class="form-group mb-5">
+                                <label>Cor</label>
+                                <input value="{{produto[3] }}" readonly type="text" class="form-control">
+                            </div>
+                            <div class="form-group mb-5">
+                                <label>Material</label>
+                                <input value="{{produto[4] }}" readonly type="text" class="form-control">
+                            </div>
+                            <div class="form-group mb-5">
+                                <label>Fornecedor</label>
+                                <input value="{{produto[8] }}" readonly type="text" class="form-control">
+                            </div>
+                            <div class="form-group mb-5">
+                                <label>Custo</label>
+                                <input type="number" value="{{produto[5] }}" readonly placeholder="Custo" class="form-control" name="Custo">
+                            </div>
+                            <div class="form-group mb-5">
+                                <label>Preço</label>
+                                <input type="number" value="{{produto[6] }}" placeholder="Preço" class="form-control" name="Preco">
+                            </div>
+                            <div class="form-group mb-5">
+                                <label>Quantidade</label>
+                                <input type="number" value="{{produto[7] }}" placeholder="Quantidade" class="form-control" name="Quantidade">
+                            </div>
+                        </div> 
+                        <br>
+                        <button type="submit"  class="btn btn-success">Salvar</button>                 
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#ListaProdutoItens').DataTable();
+        $('.js-example-basic').select2();
+        $('.deletar').click(function(){
+            var idProduto = $(this).val()
+            Swal.fire({
+                icon: 'warning',
+                tittle: 'Tem certeza?',
+                text: 'Este processo não pode ser desfeito!',
+                showCancelButton: true,
+                confirmButtonText: 'Excluir!',
+                cancelButtonText: 'Cancelar!',
+                preConfirm: () => $.post('deletar_produto', {id: idProduto})
+            }).then((result) => {
+                if (result.value){
+                    Swal.fire({
+                        title: 'Deletado!',
+                        icon:'success',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+                    // $.post('deletar_fornecedor', {id: idFornecedor})
+                }
+            })
+        })
+    });
+</script>
 {% endblock %}
+
 
 {% endif %}
 

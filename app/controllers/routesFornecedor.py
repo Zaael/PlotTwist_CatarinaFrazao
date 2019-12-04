@@ -71,12 +71,6 @@ def ListaFornecedores():
     data = [list(item) for item in dadosFornecedor]
     return data
 
-def buscaPorIdFornecedor(id):
-    cursor = connection.cursor()
-    cursor.execute('SELECT idFornecedor, Nome_Fornecedor, CNPJ, Contato FROM Fornecedor WHERE idFornecedor = %s',(id,))
-    data = cursor.fetchone()
-    return data
-
 def AtualizaFornecedor(id, nome, cnpj, contato):
     cursor = connection.cursor()
     cursor.execute('UPDATE Fornecedor SET Nome_Fornecedor = %s, CNPJ = %s, Contato = %s WHERE idFornecedor = %s',(nome,cnpj,contato,id))
