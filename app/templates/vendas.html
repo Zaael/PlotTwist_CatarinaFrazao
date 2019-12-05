@@ -74,7 +74,6 @@
     </table>
 </div>
 </div>
-{% for pedido in pedidos %}
 <div class="modal fade" id="ModalNovoPedido">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">                        
@@ -85,6 +84,7 @@
                 </button>
             </div>                
             <div class="modal-body mx-3">
+                <div class="row">
                 <form role="form" method="POST" action="{{ url_for('AdicionaPedido') }}">
                     <div class="form-row">
                         <div class="form-group col-md-5">
@@ -135,7 +135,7 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-md">
+                        <div class="form-group col-md-12">
                             <table class="table table-striped" id="ProdutosPedido">
                                 <thead class="thead">
                                     <tr>
@@ -154,70 +154,84 @@
                                 </tbody>
                             </table>
                             <br>
+                            <br>
                         </div>
                     </div>
                     <div class="form-row">
                         <br>
-                        <div class="form-group col-md-5"">
+                        <div class="form-check col-sm-3">
+                            <input name="VerificaDescontoPedido" disabled type="checkbox" class="form-check-input"  id="VerificaDescontoPedido">
+                            <label class="form-check-label">Aplica Desconto?</label>
+                        </div>
+                        <br>
+                        <div class="form-group col-md-4">
                                 <label>Desconto em %</label>
                                 <input name="DescontoPedido" value="" disabled required type="number" class="form-control"  id="DescontoPedido">
                         </div>
-                        <div class="form-group col-md-5"">
+                        <div class="form-group col-md-4">
                                 <label>Valor Final</label>
                                 <input name="ValorTotalPedido" value="" readonly required type="numeric" class="form-control"  id="ValorTotalPedido">
                         </div>
                     </div>
                 </form>
-
-
-
+                </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
             </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-              </div>
         </div>
     </div>
 </div>
-{% endfor %}
 <script>
     $(document).ready(function(){
-        var IdCliente = $('#Cliente').val();
+
+        var IdCliente = parseInt($('#Cliente').val());
         var IdUsuario = $('#idUsuario').val();
         var IdProduto = '';
+        var IdPedido = '';
         var descricao = '';
         var Marca = '';
         var Cor = '';
         var Preco = '';
         var Quantidade ='';
+        var ValorFinal = 0;
+        var QuantidadeAtual = 0;
 
         $('#ListaPedidos').DataTable();
         $('.js-example-basic').select2();
+
         $('#GravaPedido').click(function(){
             $('#ProdutoPedido').prop("disabled", false);
             $('#QuantidadePedido').prop("disabled", false);
             $('#AdicionaProdutos').prop("disabled", false);
             $('#Cliente').prop("disabled", true);
+            
+            $.post("AdicionaPedido",{idCliente:IdCliente,IdUsuario:IdUsuario}, function(data){
+                $('#GravaPedido').prop("disabled", true);
+                IdPedido = parseInt(data[0]);
+                alert(IdPedido);
+            })
         })
         $('#ProdutoPedido').change(function(){
             var id = $(this).val();
             $.post("GetProduto",{id:id}, function(data){
 
-                IdProduto = data[0];
+                IdProduto = parseInt(data[0]);
                 descricao = data[1];
                 Marca = data[2];
                 Cor = data[3];
                 Preco = data[6];
                 Quantidade = data[7]
 
-                $('#QuantidadeDisponivelPedido').val(Quantidade);
-                $('#PrecoProduto').val(Preco);
+                $('#QuantidadeDisponivelPedido').val(parseInt(Quantidade));
+                $('#PrecoProduto').val(Preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             })
         })
         $('#QuantidadePedido').focusout(function(){
-            var QuantidadeAtual = $(this).val();
+            var QuantidadeAtual = parseInt($(this).val());
             if(QuantidadeAtual >= 0 && QuantidadeAtual <= $('#QuantidadeDisponivelPedido').val()){
                 var total = $('#PrecoProduto').val() * QuantidadeAtual
-                $('#ValorTotalProduto').val(total);
+                $('#ValorTotalProduto').val(total.toFixed(2));
             }
             else{
                 alert('Quantidade maior do que a Disponível!');
@@ -236,10 +250,14 @@
                 cols += '<td>'+ $('#PrecoProduto').val() +'</td>';
                 cols += '<td class="valorTotalSoma">'+ $('#ValorTotalProduto').val() +'</td>';
                 cols += '<td>';
-                cols += '<button onclick="RemoveTableRow(this)" type="button">Remover</button>';
+                cols += '<button class="remover btn danger fa fa-trash-o" aria-hidden="true" type="button"></button>';
                 cols += '</td>';
                 newRow.append(cols);
                 $("#ProdutosPedido").append(newRow);
+
+                $.post("AdicionaPedidoItem",{idPedido:IdPedido,idProduto:IdProduto,QuantidadePedidoItem:QuantidadeAtual},function(data){
+                    alert('FOI!');
+                })
 
                 $('#ProdutoPedido').focus();
                 $('#QuantidadePedido').val(0);
@@ -247,19 +265,41 @@
                 $('#PrecoProduto').val("");
                 $('#ValorTotalProduto').val("");
 
-                ValorFinal = 0;
+                // ValorFinal = 0;
                 $('.valorTotalSoma').each(function(){
                     ValorFinal += parseFloat($(this).text());
                 });
-                AplicaDesconto = ValorFinal * ($('#DescontoPedido').val()/100);
-                $('#ValorTotalPedido').val(ValorFinal);
 
+                $('#ValorTotalPedido').val(ValorFinal.toFixed(2));
+                $('#VerificaDescontoPedido').prop("disabled",false);
+                
                 return false;
+            }
+        })
+
+        $("#ProdutosPedido").on("click",".remover", function(){
+            $(this).closest('tr').remove();
+        });
+
+        $('#VerificaDescontoPedido').change(function(){
+            if ($(this).is(":checked")) {
+                $('#DescontoPedido').prop("disabled", false);
+                $('#DescontoPedido').change(function(){
+                    AplicaDesconto = ValorFinal - (ValorFinal * (parseFloat($('#DescontoPedido').val()).toFixed(2)/100));
+                    $('#ValorTotalPedido').val(AplicaDesconto.toFixed(2));
+                })
+            }
+            else{
+                $('#DescontoPedido').val("");
+                $('#DescontoPedido').prop("disabled", true);
+                $('#ValorTotalPedido').val(ValorFinal.toFixed(2));
             }
         })
 
     })
     
+    
+
 </script>
 
 {% endblock %}

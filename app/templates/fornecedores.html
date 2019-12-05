@@ -166,8 +166,7 @@
                 text: 'Este processo não pode ser desfeito!',
                 showCancelButton: true,
                 confirmButtonText: 'Excluir!',
-                cancelButtonText: 'Cancelar!',
-                preConfirm: () => $.post('deletar_fornecedor', {id: idFornecedor})
+                cancelButtonText: 'Cancelar!'
             }).then((result) => {
                 if (result.value){
                     Swal.fire({
@@ -176,8 +175,9 @@
                         showConfirmButton: false,
                         timer: 1500
                     })
-                    window.location.href("/fornecedores")
-                    // $.post('deletar_fornecedor', {id: idFornecedor})
+                    $.post('deletar_fornecedor', {id: idFornecedor},function(){
+                        window.location.href("/fornecedores");
+                    })
                 }
             })
         })               

@@ -24,16 +24,32 @@ def vendas():
 @app.route('/AdicionaPedido', methods=['POST'])
 def AdicionaPedido():
     if request.method == 'POST':
-        cliente = request.form['Cliente']
+        cliente = request.form['idCliente']
         usuario = request.form['IdUsuario']
         print(usuario)
         try:
             print('Entrou')
             insertPedido(cliente,usuario)
-            return 'bangos'
+            return jsonify(selectUltimoPedido())
         except mysql.connector.Error as err:
             ('Deu ruim')
             msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)            
+            return redirect(url_for('vendas'))
+
+@app.route('/AdicionaPedidoItem', methods=['POST'])
+def AdicionaPedidoItem():
+    if request.method =='POST':
+        idPedido = request.form['idPedido']
+        idProduto = request.form['idProduto']
+        QuantidadePedidoItem = request.form['QuantidadePedidoItem']
+        print(idPedido,idProduto,QuantidadePedidoItem)
+        try:
+            print('Entoru Pedido Itens')
+            InsertPedidoItem(idPedido, idProduto, QuantidadePedidoItem)
+            print(selectUltimoPedidoItem())
+            return jsonify(selectUltimoPedidoItem())
+        except mysql.connector.Error as err:
+            msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)
             return redirect(url_for('vendas'))
 
 @app.route('/GetProduto', methods=['GET','POST'])
@@ -50,7 +66,6 @@ def GetProduto():
                                             Inner join Fornecedor F ON (P.idFornecedor = F.idFornecedor)\
                             WHERE idProduto = %s" %id)
             dadosProduto = cursor.fetchone()
-            #data = [list(item) for item in dadosProduto]
             print('passou')
         except mysql.connector.Error as err:
             msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)  
@@ -60,13 +75,26 @@ def GetProduto():
 
 def insertPedido(cliente,usuario):
     IdUsuario = BuscaIdUsuario(usuario)
-    print(IdUsuario, cliente)
     cursor = connection.cursor()
-    cursor.execute('INSERT INTO Pedidos (IdCliente, IdUsuario, DataPedido, HoraPedido)  VALUES (%s, %s, now(), now())', (cliente, IdUsuario))
-    cursor.execute('SELECT idPedido FROM Pedidos ORDER BY 1 DESC LIIMT 1')
+    cursor.execute('INSERT INTO Pedidos (IdCliente, IdUsuario, DataPedido, HoraPedido)  VALUES (%s, %s, now(), now())', (cliente, IdUsuario))            
     connection.commit()
 
+def InsertPedidoItem(idPedido, idProduto, QuantidadePedidoItem):
+    cursor = connection.cursor()
+    cursor.execute('INSERT INTO PedidosItens (IdPedido, IdProduto, QtdPedidoItem)  VALUES (%s, %s, %s)', (idPedido, idProduto,QuantidadePedidoItem))            
+    connection.commit()
 
+def selectUltimoPedido():
+    cursor = connection.cursor()
+    cursor.execute('SELECT IdPedido FROM Pedidos ORDER BY 1 DESC LIMIT 1')
+    IdPedido =  cursor.fetchone()
+    return IdPedido
+
+def selectUltimoPedidoItem():
+    cursor = connection.cursor()
+    cursor.execute('SELECT IdPedidoItem FROM PedidosItens ORDER BY 1 DESC LIMIT 1')
+    IdPedidoItem =  cursor.fetchone()
+    return IdPedidoItem
 
 def listaPedidos():
     cursor = connection.cursor()

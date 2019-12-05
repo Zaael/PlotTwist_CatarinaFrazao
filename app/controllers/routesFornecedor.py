@@ -61,7 +61,7 @@ def deletar_fornecedor():
             return redirect(url_for('fornecedores'))
         except mysql.connector.Error as err:
             msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)
-            return redirect(url_for('fornecedores'))
+            return redirect(url_for('logout'))
 
 
 def ListaFornecedores():
