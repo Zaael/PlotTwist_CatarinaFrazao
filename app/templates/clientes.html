@@ -98,9 +98,9 @@
                 </button>
             </div>
             <div class="modal-body mx-3">
-                <form name="formAlterar" role="form" method="POST" action="{{ url_for('alterar_cliente') }}">
+                <form name="formAlterar"  role="form" method="POST" action="{{ url_for('alterar_cliente') }}">
                     <div class="md-form mb-5">
-                        <label for="idCliente" data-error="wrong" data-success="right">Id</label>
+                        <label for="idCliente">Id</label>
                         <input value="{{ cliente[0] }}" class="form-control validate" name="idCliente" id="idCliente" maxlength="55" 
                             readonly>
                     </div>
@@ -111,18 +111,22 @@
                     <div class="md-form mb-5" id="divAltNome">
                         <label for="NomeCliente" class="control-label">**Nome</label>
                         <input value="{{ cliente[2] }}" type="text" class="form-control text-lowercase" name="NomeCliente"
-                            id="idAltNome" placeholder="nome do cliente" maxlength="60" required>
+                            id="idAltNome" placeholder="nome do cliente" maxlength="30" required>
+                            <p id="msgaltnome"></p>
                     </div>
 
                     <div class="md-form mb-5" id="divAltCelular">
                         <label for="Celular" class="control-label" >**Celular</label>
-                        <input value="{{ cliente[3] }}" type="text" class="form-control altcelular" name="Celular" id="idAltCelular"
+                        <input value="{{ cliente[3] }}" type="tel" class="form-control altcelular" name="Celular" id="idAltCelular"
                         placeholder="(00) 0 0000-0000" required>
+                        <p id="msgaltcelular"></p>
+
                     </div>
                     <div class="md-form mb-5" id="divAltEmail">
                         <label for="Email" class="control-label">Email</label>
                         <input value="{{ cliente[4] }}" type="text" class="form-control text-lowercase" name="Email" id="idAltEmail"
-                        placeholder="user@dominio.com" maxlength="50">
+                        placeholder="user@dominio.com" maxlength="40">
+                        <p id="msgaltemail"></p>
                     </div>
                     <br>
                     <p class="text-info"><b>**Campos Obrigatórios</b></p>
@@ -141,16 +145,13 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Cadastrar Cliente</h4>
-                <button type="button" class="close" data-dismiss="modal">
-                    &times;
-                </button>
             </div>
             <div class="modal-body mx-3">
-                <form name="formCriar" id="formCriar" role="form" method="POST" action="{{ url_for('criar_cliente') }}">
+                <form name="formCriar" autocomplete="off" id="formCriar" role="form" method="POST" action="{{ url_for('criar_cliente') }}">
                     <div class="form-group " id="divNome">
                         <label for="NomeCliente" class="control-label">**Nome</label>
                         <input type="text" class="form-control text-lowercase" name="NomeCliente" id="idNome"
-                            placeholder="nome do cliente" maxlength="60" required>
+                            placeholder="nome do cliente" maxlength="30" required>
                             <p id="msgnome"></p>
                     </div>
                     <div class="form-group " id="divCPF">
@@ -169,13 +170,13 @@
                     <div class="form-group" id="divEmail">
                         <label for="Email" class="control-label">E-mail</label>
                         <input type="email" class="form-control text-lowercase" name="Email" id="idEmail" placeholder="user@dominio.com"
-                        maxlength="50">
+                        maxlength="40">
                         <p id="msgemail"></p>
                     </div>
                     <p class="text-info"><b>**Campos Obrigatórios</b></p>
                     <br>
                     <button type="submit" class="btn btn-success">Salvar</button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="">Close</button>
                 </form>
             </div>
         </div>
@@ -186,6 +187,11 @@
 {% endfor %}
 
 <script>
+$('#ModalAdicionaCliente').on('hidden.bs.modal', function (event) {
+  console.log('Destroy modal');
+
+});
+
     $(document).ready(function () {
 
 //Cria uma datatables
@@ -196,21 +202,22 @@
             var idCliente = $(this).val()
             Swal.fire({
                 icon: 'warning',
-                tittle: 'Tem certeza?',
+                title: 'Tem certeza?',
                 text: 'Este processo não pode ser desfeito!',
                 showCancelButton: true,
                 confirmButtonText: 'Excluir!',
                 cancelButtonText: 'Cancelar!'
             }).then((result) => {
                 if (result.value) {
+                    $.post('deletar_cliente', { id: idCliente }, function(msg){
                     Swal.fire({
-                        title: 'Deletado!',
+                        title: msg,
                         icon: 'success',
                         showConfirmButton: false,
                         timer: 1500
-                    })
-                    $.post('deletar_cliente', { id: idCliente });
-                    document.location.reload(true);
+                    })}
+                    );
+
                 }
             })
         })
@@ -257,19 +264,19 @@
             if (func == 'none') {
                 div.classList.remove("has-success");
                 div.classList.remove("has-error");
-
+                return func;
             }
 
             if (func == true) {
                 div.classList.add("has-success");
                 div.classList.remove("has-error");
+                return func;
             }
 
             if (func == false){
-
                 div.classList.add("has-error");
                 div.classList.remove("has-success");
-                div.p.innerHTML = "content";
+                return func;
             }
         }
 
@@ -286,7 +293,7 @@ form.addEventListener('submit', function(e) {
                         title: 'Cadastro realizado!',
                         icon: 'success',
                         showConfirmButton: false,
-                        timer: 500
+                        timer: 1500
                     })
             }
             else {e.preventDefault();}
@@ -296,10 +303,34 @@ form.addEventListener('submit', function(e) {
 
 //Validar Email
         idEmail.addEventListener("blur", function () {
-            acaoInput(validarEmail(idEmail), divEmail);
+            var ret = acaoInput(validarEmail(idEmail), divEmail);
+            if (ret){
+                document.getElementById("msgemail").innerHTML = "<font color ='green'> E-mail válido! </font>" ;
+
+            }
+            if (ret == false){
+                document.getElementById("msgemail").innerHTML = "<font color ='red'> E-mail inválido! </font>";
+
+            }
+            if (ret == 'none'){
+                document.getElementById("msgemail").innerHTML = "";
+            }
         });
         idAltEmail.addEventListener("blur", function () {
-            acaoInput(validarEmail(idAltEmail), divAltEmail);
+            var ret = acaoInput(validarEmail(idAltEmail), divAltEmail);
+            console.log('opa')
+            if (ret == true){
+                console.log('bom')
+
+                document.getElementById("msgaltemail").innerHTML = "<font color ='green'> E-mail válido! </font>" ;
+            }
+            if (ret == false){
+                document.getElementById("msgaltemail").innerHTML = "<font color ='red'> E-mail inválido! </font>";
+            }
+            if (ret == 'none'){
+                document.getElementById("msgaltemail").innerHTML = "";
+
+            }
         });
         function validarEmail(field) {
             var usuario = field.value.substring(0, field.value.indexOf("@"));
@@ -307,7 +338,6 @@ form.addEventListener('submit', function(e) {
             if ((usuario.length == 0) &&
                 (dominio.length == 0))
                 {
-                document.getElementById("msgemail").innerHTML = "";
                 return statusEmail = 'none';
                 }
 
@@ -318,18 +348,29 @@ form.addEventListener('submit', function(e) {
                 (dominio.search(".") != -1) &&
                 (dominio.indexOf(".") >= 1) &&
                 (dominio.lastIndexOf(".") < dominio.length - 1)) {
-                document.getElementById("msgemail").innerHTML = "<font color ='green'> E-mail válido! </font>" ;
+
                 return statusEmail = true;
             }
 
             else {
-                document.getElementById("msgemail").innerHTML = "<font color ='red'> E-mail inválido! </font>";
+
                 return statusEmail = false;
             }
         }
 //Validar CPF
         idCPF.addEventListener("blur", function () {
-            acaoInput(validarCPF(), divCPF);
+            var ret = acaoInput(validarCPF(), divCPF);
+            if (ret == true){
+                document.getElementById("msgcpf").innerHTML = "<font color ='green'> CPF válido! </font>";
+
+            }
+            if (ret == false){
+                document.getElementById("msgcpf").innerHTML = "<font color ='red'> CPF inválido! </font>";
+
+            }
+            else{
+
+            }
         });
 
         function validarCPF() {
@@ -346,8 +387,8 @@ form.addEventListener('submit', function(e) {
                 cpf == "66666666666" ||
                 cpf == "77777777777" ||
                 cpf == "88888888888" ||
-                cpf == "99999999999")
-                return statusCPF = false;
+                cpf == "99999999999"){
+                return statusCPF = false;}
             // Valida 1o digito	
             add = 0;
             for (i = 0; i < 9; i++)
@@ -355,8 +396,8 @@ form.addEventListener('submit', function(e) {
             rev = 11 - (add % 11);
             if (rev == 10 || rev == 11)
                 rev = 0;
-            if (rev != parseInt(cpf.charAt(9)))
-                return statusCPF = false;
+            if (rev != parseInt(cpf.charAt(9))){
+                return statusCPF = false;}
             // Valida 2o digito	
             add = 0;
             for (i = 0; i < 10; i++)
@@ -364,17 +405,39 @@ form.addEventListener('submit', function(e) {
             rev = 11 - (add % 11);
             if (rev == 10 || rev == 11)
                 rev = 0;
-            if (rev != parseInt(cpf.charAt(10)))
-                return statusCPF = false;
+            if (rev != parseInt(cpf.charAt(10))){
+                return statusCPF = false;}
             return statusCPF = true;
         }
 
 //Validar Celular
         idCelular.addEventListener("blur", function () {
-            acaoInput(validPhone(idCelular), divCelular);
+            var ret = acaoInput(validPhone(idCelular), divCelular);
+            if (ret == true){
+                document.getElementById("msgcelular").innerHTML = "<font color ='green'> Celular válido! </font>" ;
+
+            }
+            if (ret == false){
+                document.getElementById("msgcelular").innerHTML = "<font color ='red'> Celular inválido! </font>" ;
+
+            }
+            else{
+
+            }
         });
         idAltCelular.addEventListener("blur", function () {
-            acaoInput(validPhone(idAltCelular), divAltCelular);
+            var ret = acaoInput(validPhone(idAltCelular), divAltCelular);
+            if (ret == true){
+                document.getElementById("msgaltcelular").innerHTML = "<font color ='green'> Celular válido! </font>" ;
+
+            }
+            if (ret == false){
+                document.getElementById("msgaltcelular").innerHTML = "<font color ='red'> Celular inválido! </font>" ;
+
+            }
+            else{
+                
+            }
         });
         function validPhone(phone){
             var celular = phone.value.toString();
@@ -382,20 +445,38 @@ form.addEventListener('submit', function(e) {
             var res = reg.test(celular);
             
             if (res) {
-                document.getElementById("msgcelular").innerHTML = "<font color ='green'> Celular válido </font>" ;
                 return statusCelular = res
             }
             else {
-                document.getElementById("msgcelular").innerHTML = "<font color ='red'> Celular inválido </font>" ;
                 return statusCelular = res
             }
         }
 //Validar Nome
         idNome.addEventListener("blur", function () {
-            acaoInput(validaNome(idNome), divNome);
+            var ret = acaoInput(validaNome(idNome), divNome);
+            if (ret == true){
+                document.getElementById("msgnome").innerHTML = "<font color ='green'> Nome válido! </font>" ;
+
+            }
+            if (ret == false){
+                document.getElementById("msgnome").innerHTML = "<font color ='red'> Nome inválido! </font>" ;
+
+            }
+            else{
+                
+            }
         });
         idAltNome.addEventListener("blur", function () {
-            acaoInput(validaNome(idAltNome), divAltNome);
+            var ret = acaoInput(validaNome(idAltNome), divAltNome);
+            if (ret == true){
+                document.getElementById("msgaltnome").innerHTML = "<font color ='green'> Nome válido! </font>" ;
+            }
+            if (ret == false){
+            document.getElementById("msgaltnome").innerHTML = "<font color ='red'> Nome inválido! </font>" ;
+            }
+            else{
+                
+            }
         });
         function validaNome(nome){
 
@@ -412,11 +493,11 @@ form.addEventListener('submit', function(e) {
             }
             
             if(valido){
-                document.getElementById("msgnome").innerHTML = "<font color ='green'> Nome válido </font>" ;
+
                 return statusNome = valido;
             }
             }
-            document.getElementById("msgnome").innerHTML = "<font color ='red'> Nome inválido </font>" ;
+
             return statusNome = false;
             }
     })

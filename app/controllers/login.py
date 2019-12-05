@@ -6,17 +6,6 @@ connection = db.db_connection()
 
 
 @app.route('/')
-@app.route('/index/')
-def index():
-    if 'loggedin' in session:
-        return render_template('dashboard.html',
-                               loggedin=session['loggedin'],
-                               username=session['username'],
-                               breadcrumb='parâmetro breadcrumb',
-                               page_header='parâmetro page_header')
-    return redirect(url_for('login'))
-
-
 @app.route('/login', methods=['GET', 'POST']) 
 def login():
     msg = ''

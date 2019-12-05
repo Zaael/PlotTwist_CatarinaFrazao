@@ -10,17 +10,6 @@ from app.controllers import home
 
 connection = db.db_connection()
 
-@app.route('/clientes')
-def cliente_inicio():
-    if 'loggedin' in session:
-        return render_template('clientes.html',
-                               username=session['username'],
-                               loggedin=session['loggedin'],
-                               breadcrumb='Clientes',
-                               page_header ='Menu de Navegação')
-    return redirect(url_for('login'))
-
-
 @app.route('/cliente',methods=['GET','POST'])
 def cliente():
     if 'loggedin' in session:
@@ -48,7 +37,6 @@ def criar_cliente():
             msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)
             return redirect(url_for('cliente'))
 
-
 @app.route('/alterar_cliente', methods=['POST'])
 def alterar_cliente():
     if request.method == 'POST':
@@ -69,11 +57,11 @@ def deletar_cliente():
     if request.method == 'POST':
         idcliente = request.form['id']
         try:
-            deletarCliente(idcliente)
-            return redirect(url_for('cliente'))
+            msg = deletarCliente(idcliente)
+            return msg
         except mysql.connector.Error as err:
             msg = 'Ops! Algo deu errado. Tente novamente. Erro: {}'.format(err)
-            return redirect(url_for('cliente'))
+            return msg
 
 
 def listaCliente():
@@ -83,23 +71,21 @@ def listaCliente():
     data = [list(item) for item in dadoscliente]
     return data
 
-def buscaPorIdCliente(id):
-    cursor = connection.cursor()
-    cursor.execute('SELECT idCliente, CPF, Nome, Celular, Email FROM cliente WHERE idcliente = %s',(id))
-    data = cursor.fetchone()
-    return data
-
 def atualizaCliente(id, nome, CPF, Celular, Email):
     cursor = connection.cursor()
-    cursor.execute('UPDATE cliente SET Nome = %s, CPF = %s, Celular = %s, Email = %s WHERE idcliente = %s',(nome,CPF,Celular, Email,id))
+    cursor.execute("UPDATE cliente SET Nome = %s, CPF = replace(replace(%s, '.', ''), '-', '') \
+    , Celular = replace(replace(replace(replace(%s, '(', ''), ')', ''), '-', ''), ' ', ''), Email = %s  WHERE idcliente = %s",(nome,CPF,Celular, Email,id))
     connection.commit()
 
 def deletarCliente(id):
     cursor = connection.cursor()
-    cursor.execute('DELETE FROM cliente WHERE idCliente = %s' % id)
+    print('opa')
+    cursor.execute("DELETE FROM cliente WHERE idCliente = %s" % id)
     connection.commit()
+    return 'Deletado!'
 
 def criaCliente(nome, CPF, Celular, Email):
     cursor = connection.cursor()
-    cursor.execute('INSERT INTO cliente (Nome, CPF, Celular, Email) VALUES (%s, %s, %s, %s)',(nome, CPF, Celular, Email))
+    cursor.execute("insert into Cliente (Nome, CPF, Celular, Email) values (%s, replace(replace(%s, '.', ''), '-', '') \
+    , replace(replace(replace(replace(%s, '(', ''), ')', ''), '-', ''), ' ', ''), %s )",(nome, CPF, Celular, Email))
     connection.commit()

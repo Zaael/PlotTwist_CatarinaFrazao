@@ -1,0 +1,568 @@
+{% extends 'base-template.html' %}
+
+{% block title %} Fornecedores {% endblock %}
+
+{% if loggedin %} 
+
+{% block breadcrumb %}	
+
+    {% if breadcrumb %}
+    <div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
+    <div class="row">
+        <ol class="breadcrumb">
+            <li><a href="#">
+                <em class="fa fa-home"></em>
+            </a></li>
+            <li class="active">{{breadcrumb}}</li>
+        </ol>
+    </div>
+    <!--/.row-->
+    {% endif %} <!--/endif breadcrumb-->
+    {% endblock %}
+
+{% block page_header %}
+
+    {% if page_header %}
+    <div class="row">
+        <div class="col-lg-12">
+            <h3 class="page-header">{{page_header}}</h3>
+        </div>
+    </div><!--/.row-->
+    {% endif %} <!--/endif page_header-->
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <button type="button" class="btn btn-success" id="Adicionar" data-toggle="modal" data-target="#ModalAdicionaFornecedor">
+            Adicionar
+        </button>    
+    </div>
+</div>
+<div class="col"> 
+    <br>
+    <table id='ListaFornecedores' class='display'>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>CNPJ</th>
+                <th>Fornecedor</th>
+                <th>Contato</th>
+                <th>Celular</th>
+                <th>Email</th>
+                <th>Ações</th>                            
+            </tr>
+        </thead>
+        <tbody>
+            {% for fornecedor in fornecedores %}
+            <tr>
+                <td>{{ fornecedor[0] }}</td>
+                <td>{{ fornecedor[1] }}</td>
+                <td>{{ fornecedor[2] }}</td>
+                <td>{{ fornecedor[3] }}</td>
+                <td>{{ fornecedor[4] }}</td>
+                <td>{{ fornecedor[5] }}</td>
+
+                <td> 
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary mr-5" data-toggle="modal" data-target="#ModalAlteraFornecedor{{ fornecedor[0] }}">
+                            Alterar
+                        </button>
+                        <button type="button" class="btn btn-danger deletar" id="Delete" value="{{ fornecedor[0] }}">
+                            Deletar
+                        </button>
+                    </div> 
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+    {% for fornecedor in fornecedores %}
+    <div class="modal fade" id="ModalAlteraFornecedor{{ fornecedor[0] }}">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">                        
+                <div class="modal-header">
+                    <h4 class="modal-title">Alteração de Fornecedor</h4>
+                    </button>
+                </div>                
+                <div class="modal-body mx-3">
+                    <form name="formAlterar"  role="form" method="POST" action="{{ url_for('alterar_fornecedor') }}">            
+                    <div class="md-form mb-5">
+                        <label for="idFornecedor">Id</label>
+                        <input value="{{ fornecedor[0] }}" class="form-control validate" name="idFornecedor" id="idAltFornecedor" readonly >
+                    </div>
+                    <div class="md-form mb-5">
+                        <label>CNPJ</label>
+                        <input value="{{ fornecedor[1] }}" type="numeric" class="form-control altcnpj" name="CNPJ" id="idAltCNPJ"  readonly>
+                    </div> 
+                    <div class="md-form mb-5"  id="divAltNomeFornecedor">
+                        <label for="NomeFornecedor" class="control-label">**Nome Fornecedor</label>
+                        <input value="{{ fornecedor[2] }}" type="text" class="form-control" maxlength="35" name="NomeFornecedor" id="idAltNomeFornecedor"  required>
+                        <p id="msgaltnome"></p>
+                    </div>
+
+                    <div class="md-form mb-5" id="divAltContato">
+                        <label for="Contato" class="control-label">Contato</label>
+                        <input value="{{ fornecedor[3] }}" type="text" class="form-control" maxlength="25" name="Contato" id="idAltContato">
+                        <p id="msgaltcontato"></p>
+
+                    </div>
+                    <div class="md-form mb-5" id="divAltCelular">
+                        <label for="Celular" class="control-label">Celular</label>
+                        <input value="{{ fornecedor[4] }}" type="tel" class="form-control altcelular" name="Celular" id="idAltCelular">
+                        <p id="msgaltcelular"></p>
+                    </div>
+                    <div class="md-form mb-5" id="divAltEmail">
+                        <label for="Email" class="control-label">Email</label>
+                        <input value="{{ fornecedor[5] }}" type="text" class="form-control" maxlength="40" name="Email" id="idAltEmail">
+                        <p id="msgaltemail"></p>
+                    </div>
+                    <br>
+                    <p class="text-info"><b>**Campos Obrigatórios</b></p>
+                    <button type="submit" class="btn btn-success">Salvar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <div class="modal fade" id="ModalAdicionaFornecedor">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">                        
+                    <div class="modal-header">
+                        <h4 class="modal-title">Novo Fornecedor</h4>
+                    </div>                
+                    <div class="modal-body mx-3">
+                        <form name="formCriar" autocomplete="off" id="formCriar" role="form" method="POST" action="{{ url_for('criar_fornecedor') }}">            
+
+                        <div class="md-form mb-5" id="divNomeFornecedor">
+                            <label for="NomeFornecedor" class="control-label">**Nome Fornecedor</label>
+                            <input type="text" class="form-control text-lowercase" name="NomeFornecedor" id="idNomeFornecedor" 
+                            placeholder="nome do fornecedor" maxlength="35" required>
+                            <p id="msgnome"></p>
+
+                        </div>
+
+                        <div class="md-form mb-5" id="divCNPJ">
+                            <label for="CNPJ" class="control-label">**CNPJ</label>
+                            <input type="numeric" class="form-control cnpj" name="CNPJ" id="idCNPJ" placeholder="00.000.000/0000-00" required>
+                            <p id="msgcnpj"></p>
+                        </div>
+
+                        <div class="md-form mb-5" id="divContato">
+                            <label for="Contato" class="control-label">Contato</label>
+                            <input type="text" class="form-control text-lowercase" name="Contato" id="idContato" 
+                            placeholder="nome do contato" maxlength="25">
+                            <p id="msgcontato"></p>
+                        </div>
+                        <div class="md-form mb-5" id="divCelular">
+                            <label for="Celular" class="control-label">Celular</label>
+                            <input type="tel" class="form-control  celular" name="Celular" id="idCelular"  placeholder="(00) 0 0000-0000" >
+                            <p id="msgcelular"></p>
+                        </div>
+
+                        <div class="md-form mb-5" id="divEmail">
+                            <label for="Email" class="control-label">Email</label>
+                            <input type="text" class="form-control text-lowercase" name="Email" id="idEmail"  
+                            placeholder="user@dominio.com" maxlength="40" >
+                            <p id="msgemail"></p>
+                        </div>
+
+                        <p class="text-info"><b>**Campos Obrigatórios</b></p>
+                        <br>
+                        <button type="submit" class="btn btn-success">Salvar</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+<script>
+    $(document).ready(function(){
+        //Mascaras
+        $('.celular').mask('(99) 9 9999-9999');
+
+        $(".cnpj").mask('00.000.000/0000-00', { reverse: true });
+
+        $('.altcelular').mask('(99) 9 9999-9999');
+
+        $(".altcnpj").mask('00.000.000/0000-00', { reverse: true });
+
+        //Cria uma datatables
+        $('#ListaFornecedores').DataTable(); 
+
+        //Envia informações para o python deletar dados
+        $('.deletar').click(function(){
+            var idFornecedor = $(this).val()
+            Swal.fire({
+                icon: 'warning',
+                title: 'Tem certeza?',
+                text: 'Este processo não pode ser desfeito!',
+                showCancelButton: true,
+                confirmButtonText: 'Excluir!',
+                cancelButtonText: 'Cancelar!',
+            }).then((result) => {
+                if (result.value){
+                    Swal.fire({
+                        title: 'Deletado!',
+                        icon:'success',
+                        showConfirmButton: false,
+                        timer: 1500
+
+                    })
+
+                    $.post('deletar_fornecedor', { id: idFornecedor } ,function(){
+                        window.location.href("/fornecedores");
+                    });
+                }
+            })
+        }) 
+//Variaveis FORM 
+        var statusNome = null;
+        var statusCNPJ = null;
+        var statusContato = null;
+        var statusCelular = null;
+        var statusEmail = null;
+
+        var idCNPJ = document.getElementById("idCNPJ");
+        var divCNPJ = document.getElementById("divCNPJ");
+
+        var idEmail = document.getElementById("idEmail");
+        var divEmail = document.getElementById("divEmail");
+
+        var idCelular = document.getElementById("idCelular");
+        var divCelular = document.getElementById("divCelular");
+
+        var idContato= document.getElementById("idContato");
+        var divContato = document.getElementById("divContato");
+
+        var idNomeFornecedor = document.getElementById("idNomeFornecedor");
+        var divNomeFornecedor = document.getElementById("divNomeFornecedor");
+
+        var idAltEmail = document.getElementById("idAltEmail");
+        var divAltEmail = document.getElementById("divAltEmail");
+  
+        var idAltContato= document.getElementById("idAltContato");
+        var divAltContato = document.getElementById("divAltContato");
+
+        var idAltCelular= document.getElementById("idAltCelular");
+        var divAltCelular = document.getElementById("divAltCelular");
+
+        var idAltNomeFornecedor = document.getElementById("idAltNomeFornecedor");
+        var divAltNomeFornecedor = document.getElementById("divAltNomeFornecedor");
+
+        function acaoInput(func, div) {
+            if (func == 'none') {
+                div.classList.remove("has-success");
+                div.classList.remove("has-error");
+                return func;
+            }
+
+            if (func == true) {
+                div.classList.add("has-success");
+                div.classList.remove("has-error");
+                return func;
+            }
+
+            if (func == false){
+                div.classList.add("has-error");
+                div.classList.remove("has-success");
+                return func;
+            }
+        }
+
+//Validar Formulário para Envio
+var form = document.getElementById('formCriar');
+
+form.addEventListener('submit', function(e) {
+            if ((statusNome == true) &&
+            (statusContato == true ||  statusContato == 'none') &&
+            (statusCNPJ == true) &&
+            (statusCelular == true || statusCelular == 'none') &&
+            (statusEmail == true || statusEmail == 'none'))
+            {
+                Swal.fire({
+                        title: 'Cadastro realizado!',
+                        icon: 'success',
+                        showConfirmButton: false,
+                        timer: 500
+                    })
+            }
+            else {
+                console.log (statusCelular,statusContato,statusEmail,statusNome,statusCNPJ);
+e.preventDefault();}
+
+        })
+
+//Validar Email
+idEmail.addEventListener("blur", function () {
+            var ret = acaoInput(validarEmail(idEmail), divEmail);
+            if (ret){
+                document.getElementById("msgemail").innerHTML = "<font color ='green'> E-mail válido! </font>" ;
+
+            }
+            if (ret == false){
+                document.getElementById("msgemail").innerHTML = "<font color ='red'> E-mail inválido! </font>";
+
+            }
+            if (ret == 'none'){
+                document.getElementById("msgemail").innerHTML = "";
+            }
+        });
+        idAltEmail.addEventListener("blur", function () {
+            var ret = acaoInput(validarEmail(idAltEmail), divAltEmail);
+            if (ret == true){
+                document.getElementById("msgaltemail").innerHTML = "<font color ='green'> E-mail válido! </font>" ;
+            }
+            if (ret == false){
+                document.getElementById("msgaltemail").innerHTML = "<font color ='red'> E-mail inválido! </font>";
+            }
+            if (ret == 'none'){
+                document.getElementById("msgaltemail").innerHTML = "";
+
+            }
+        });
+        function validarEmail(field) {
+            var usuario = field.value.substring(0, field.value.indexOf("@"));
+            var dominio = field.value.substring(field.value.indexOf("@") + 1, field.value.length);
+            if ((usuario.length == 0) &&
+                (dominio.length == 0))
+                {
+                return statusEmail = 'none';
+                }
+
+            if ((usuario.search("@") == -1) &&
+                (dominio.search("@") == -1) &&
+                (usuario.search(" ") == -1) &&
+                (dominio.search(" ") == -1) &&
+                (dominio.search(".") != -1) &&
+                (dominio.indexOf(".") >= 1) &&
+                (dominio.lastIndexOf(".") < dominio.length - 1)) {
+                return statusEmail = true;
+            }
+
+            else {
+                return statusEmail = false;
+            }
+        }
+              
+//Validar CNPJ
+        idCNPJ.addEventListener("blur", function () {
+            var ret = acaoInput(validarCNPJ(), divCNPJ);
+            if (ret == true){
+                document.getElementById("msgcnpj").innerHTML = "<font color ='green'> CNPJ válido! </font>";
+                statusCNPJ = ret
+            }
+            if (ret == false){
+                document.getElementById("msgcnpj").innerHTML = "<font color ='red'> CNPJ inválido! </font>";
+                statusCNPJ = ret
+
+            }
+            else{
+
+            }        
+            });
+        function validarCNPJ() {
+            var cnpj = $('.cnpj').cleanVal();
+
+            // Elimina CNPJs invalidos conhecidos
+            if (cnpj.length != 14 ||
+                cnpj == "00000000000000" || 
+                cnpj == "11111111111111" || 
+                cnpj == "22222222222222" || 
+                cnpj == "33333333333333" || 
+                cnpj == "44444444444444" || 
+                cnpj == "55555555555555" || 
+                cnpj == "66666666666666" || 
+                cnpj == "77777777777777" || 
+                cnpj == "88888888888888" || 
+                cnpj == "99999999999999"){
+                return false;}
+                
+            // Valida DVs
+            tamanho = cnpj.length - 2
+            numeros = cnpj.substring(0,tamanho);
+            digitos = cnpj.substring(tamanho);
+            soma = 0;
+            pos = tamanho - 7;
+            for (i = tamanho; i >= 1; i--) {
+            soma += numeros.charAt(tamanho - i) * pos--;
+            if (pos < 2)
+                    pos = 9;
+            }
+            resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+            if (resultado != digitos.charAt(0)){
+                return false;}
+                
+            tamanho = tamanho + 1;
+            numeros = cnpj.substring(0,tamanho);
+            soma = 0;
+            pos = tamanho - 7;
+            for (i = tamanho; i >= 1; i--) {
+            soma += numeros.charAt(tamanho - i) * pos--;
+            if (pos < 2)
+                    pos = 9;
+            }
+            resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+            if (resultado != digitos.charAt(1)){
+                return false;}
+
+            return true;
+            
+            }
+
+            //Validar Celular
+            idCelular.addEventListener("blur", function () {
+            var ret = acaoInput(validPhone(idCelular), divCelular);
+            if (ret == true){
+                document.getElementById("msgcelular").innerHTML = "<font color ='green'> Celular válido! </font>" ;
+
+            }
+            if (ret == false){
+                document.getElementById("msgcelular").innerHTML = "<font color ='red'> Celular inválido! </font>" ;
+
+            }
+            if (ret == 'none'){
+                document.getElementById("msgcelular").innerHTML = "";
+
+            }
+        });
+        idAltCelular.addEventListener("blur", function () {
+            var ret = acaoInput(validPhone(idAltCelular), divAltCelular);
+            if (ret == true){
+                document.getElementById("msgaltcelular").innerHTML = "<font color ='green'> Celular válido! </font>" ;
+
+            }
+            if (ret == false){
+                document.getElementById("msgaltcelular").innerHTML = "<font color ='red'> Celular inválido! </font>" ;
+
+            }
+            if (ret == 'none'){
+                document.getElementById("msgaltcelular").innerHTML = "";
+
+            }
+        });
+
+        function validPhone(phone){
+            var celular = phone.value.toString();
+            var reg = new RegExp(/(\(\d{2}\)\s)([9]\s)(\d{4}\-\d{4})$/);
+            var res = reg.test(celular);
+            if (celular.length == 0){
+
+                return statusCelular = 'none';
+            }
+            if (res) {
+                return statusCelular = res;
+            }
+            else {
+                return statusCelular = res;
+            }
+        }
+//Validar Nome
+        idNomeFornecedor.addEventListener("blur", function () {
+            var ret =acaoInput(validaNome(idNomeFornecedor), divNomeFornecedor);
+            if (ret == true){
+                document.getElementById("msgnome").innerHTML = "<font color ='green'> Nome válido! </font>" ;
+                statusNome = ret;
+
+            }
+            if (ret == false){
+                document.getElementById("msgnome").innerHTML = "<font color ='red'> Nome inválido! </font>" ;
+                statusNome = ret;
+
+            }
+            if (ret == 'none'){
+                document.getElementById("msgnome").innerHTML = "";
+                statusNome = ret;
+
+            }
+        });
+        idAltNomeFornecedor.addEventListener("blur", function () {
+            var ret =acaoInput(validaNome(idAltNomeFornecedor), divAltNomeFornecedor);
+            if (ret == true){
+                document.getElementById("msgaltnome").innerHTML = "<font color ='green'> Nome válido! </font>" ;
+                statusNome = ret;
+            }
+            if (ret == false){
+                document.getElementById("msgaltnome").innerHTML = "<font color ='red'> Nome inválido! </font>" ;
+                statusNome = ret;
+
+            }
+            if (ret == 'none'){
+                document.getElementById("msgaltnome").innerHTML = "";
+                statusNome = ret;
+
+            }
+        });
+
+        idContato.addEventListener("blur", function () {
+            var ret =acaoInput(validaNome(idContato), divContato);
+            if (ret == true){
+                document.getElementById("msgcontato").innerHTML = "<font color ='green'> Contato válido! </font>" ;
+                statusContato = ret;
+
+            }
+            if (ret == false){
+                document.getElementById("msgcontato").innerHTML = "<font color ='red'> Contato inválido! </font>" ;
+                statusContato = ret;
+
+            }
+            if (ret == 'none'){
+                document.getElementById("msgcontato").innerHTML = "";
+                statusContato = ret;
+
+            }
+        });
+        idAltContato.addEventListener("blur", function () {
+            var ret = acaoInput(validaNome(idAltContato), divAltContato);
+            if (ret == true){
+                document.getElementById("msgaltcontato").innerHTML = "<font color ='green'> Contato válido! </font>" ;
+                statusContato = ret;
+            }
+            if (ret == false){
+                document.getElementById("msgaltcontato").innerHTML = "<font color ='red'> Contato inválido! </font>" ;
+                statusContato = ret;
+            }
+            if (ret == 'none'){
+                document.getElementById("msgaltcontato").innerHTML = "";
+                statusContato = ret;
+            }
+        });
+
+        function validaNome(nome){
+
+            var nomes = nome.value.trim().split(' ');
+            if (nomes == ""){
+                return status = 'none';
+            }
+            if(nomes.length > 1){
+            var valido = false;
+            for(var x=0;x<nomes.length;x++){
+                if(nomes[x].match(/^[a-zA-Z\u00C0-\u017F´]*$/)){
+                    valido = true;
+                }else{
+                    valido = false;
+                    break;
+                }
+            }
+            
+            if(valido){
+                return status = valido;
+            }
+            }
+            return status = false;
+            }
+    })
+</script>
+
+{% endblock %}
+
+{% endif %}
+
+
+

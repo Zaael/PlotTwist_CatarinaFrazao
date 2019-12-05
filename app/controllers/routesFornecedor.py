@@ -10,99 +10,78 @@ from app.controllers import home
 
 connection = db.db_connection()
 
-@app.route('/fornecedor/')
-def fornecedor():
+@app.route('/fornecedores',methods=['GET','POST'])
+def fornecedores():
     if 'loggedin' in session:
-        return render_template('fornecedor.html',
+        fornecedores = ListaFornecedores()
+        return render_template('fornecedores.html', fornecedores= fornecedores,
                                 username=session['username'],
                                 loggedin=session['loggedin'],
-                                breadcrumb='Fornecedor',
-                                page_header ='Menu de Navegação')
+                                breadcrumb='Consultar Fornecedores',
+                                page_header='Fornecedores')
     return redirect(url_for('login'))
-
-@app.route('/cadastro_fornecedor', methods=['GET', 'POST'])
-def cadastro_fornecedor():
-    if 'loggedin' in session:
-        return render_template('cadastro-fornecedor.html',
-                                username=session['username'],
-                                loggedin=session['loggedin'],
-                                breadcrumb='Cadastro Fornecedor',
-                                page_header='Menu de Cadastro')
-    return redirect(url_for('login'))
-
 
 @app.route('/criar_fornecedor', methods=['GET','POST'])
 def criar_fornecedor():
     if  request.method == 'POST':
-        nomeFornecedor = request.form['Nome_Fornecedor']
+        nomeFornecedor = request.form['NomeFornecedor']
         cnpj = request.form['CNPJ']
         contato = request.form['Contato']
+        celular = request.form['Celular']
+        email = request.form['Email']
         try:
             cursor = connection.cursor()
-            cursor.execute('INSERT INTO Fornecedor (nome_Fornecedor, CNPJ, Contato) VALUES (%s, %s, %s)',(nomeFornecedor,cnpj,contato))
+            cursor.execute("INSERT INTO Fornecedor (nome_Fornecedor, CNPJ, Contato, Celular, Email) VALUES \
+            (%s, replace(replace(replace(%s, '.', ''), '-', ''), '/', ''), %s \
+            , replace(replace(replace(replace(%s, '(', ''), ')', ''), '-', ''), ' ', ''), %s)",(nomeFornecedor,cnpj,contato, celular, email))
             connection.commit()
             msg = 'Cadastro de Fornecedor realizado com sucesso!'
-            return redirect(url_for('cadastro_fornecedor'))
+            return redirect(url_for('fornecedores'))
         except mysql.connector.Error as err:
             msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)
-            return redirect(url_for('cadastro_fornecedor'))
-
-@app.route('/buscar',methods=['GET','POST'])
-def buscar():
-    if 'loggedin' in session:
-        fornecedores = ListaFornecedores()
-        return render_template('buscar_fornecedor.html', fornecedores= fornecedores,
-                                username=session['username'],
-                                loggedin=session['loggedin'],
-                                breadcrumb='Consultar Fornecedores',
-                                page_header='Menu de Consulta')
-    return redirect(url_for('login'))
+            return redirect(url_for('fornecedores'))
 
 @app.route('/alterar', methods=['POST'])
 def alterar_fornecedor():
-    if request.method == 'POST':
+    if  request.method == 'POST':
         idFornecedor = request.form['idFornecedor']
-        nomeFornecedor = request.form['Nome_Fornecedor']
-        cnpj = request.form['CNPJ']
+        nomeFornecedor = request.form['NomeFornecedor']
         contato = request.form['Contato']
+        celular = request.form['Celular']
+        email = request.form['Email']
         try:
-            AtualizaFornecedor(idFornecedor, nomeFornecedor, cnpj, contato)
-            return redirect(url_for('buscar'))
+            AtualizaFornecedor(idFornecedor, nomeFornecedor, contato, celular, email)
+            return redirect(url_for('fornecedores'))
         except mysql.connector.Error as err:
             msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)
-            return redirect(url_for('buscar'))
+            return redirect(url_for('fornecedores'))
 
-@app.route('/deletar', methods=['POST'])
-def deletar_fornecedor(id):
+@app.route('/deletar_fornecedor', methods=['GET','POST'])
+def deletar_fornecedor():
     if request.method == 'POST':
-        idFornecedor = request.form['idFornecedor']
+        idFornecedor = request.form['id']
+        print(idFornecedor)
         try:
             deletarFornecedor(idFornecedor)
-            return redirect(url_for('buscar'))
+            return redirect(url_for('fornecedores'))
         except mysql.connector.Error as err:
             msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)
-            return redirect(url_for('buscar'))
-
+            return redirect(url_for('fornecedores'))
 
 def ListaFornecedores():
     cursor = connection.cursor()
-    cursor.execute("SELECT idFornecedor, Nome_Fornecedor, CNPJ, Contato from Fornecedor")
+    cursor.execute("SELECT idFornecedor, CNPJ, Nome_Fornecedor, Contato, Celular, Email from Fornecedor")
     dadosFornecedor = cursor.fetchall()
     data = [list(item) for item in dadosFornecedor]
     return data
 
-def buscaPorIdFornecedor(id):
+def AtualizaFornecedor(id, nome, contato, celular, email):
     cursor = connection.cursor()
-    cursor.execute('SELECT idFornecedor, Nome_Fornecedor, CNPJ, Contato FROM Fornecedor WHERE idFornecedor = %s',(id,))
-    data = cursor.fetchone()
-    return data
-
-def AtualizaFornecedor(id, nome, cnpj, contato):
-    cursor = connection.cursor()
-    cursor.execute('UPDATE Fornecedor SET Nome_Fornecedor = %s, CNPJ = %s, Contato = %s WHERE idFornecedor = %s',(nome,cnpj,contato,id))
+    cursor.execute("UPDATE Fornecedor SET Nome_Fornecedor = %s, Contato = %s, Celular =replace(replace(replace(replace(%s, '(', ''), ')', ''), '-', ''), ' ', '') \
+    , Email = %s WHERE idFornecedor = %s",(nome,contato, celular, email, id))
     connection.commit()
 
 def deletarFornecedor(id):
     cursor = connection.cursor()
-    cursor.execute('DELETE FROM Fornecedores WHERE idFornecedor = %s',(id,))
+    cursor.execute('DELETE FROM Fornecedor WHERE idFornecedor = %s' %id)
     connection.commit()
