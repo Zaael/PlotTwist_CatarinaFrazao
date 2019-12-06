@@ -65,7 +65,7 @@
     <div>
         <p>Selecione a data para ver os itens menos vendidos no periodo!</p>
 
-        <input type="text" name="datefiltermenos" value="" placeholder="YYYY/MM/DD" />
+        <input type="text" id='filtermenos' name="datefiltermenos" value="" placeholder="YYYY/MM/DD" />
     </div>
     <div class="row">
         <div class="col-8">
@@ -100,23 +100,26 @@ $(document).ready(function () {
 
             $('input[name="datefilter"]').on('apply.daterangepicker', function (ev, picker) {
                 $(this).val(picker.startDate.format('YYYY-MM-DD') + ' / ' + picker.endDate.format('YYYY-MM-DD'));
-                var data = document.getElementById('datemais')
-                var mindata = data.value.substring(0, data.value.indexOf("/"));
-                var maxdata = data.value.substring(data.value.indexOf("/") + 1, data.value.length);
+                var element = document.getElementById('datemais')
+                var minelement = element.value.substring(0, element.value.indexOf("/"));
+                var maxelement = element.value.substring(element.value.indexOf("/") + 1, element.value.length);
 
-                //var tb = document.getElementById('tablemais')
-                //var tr = tb.closest('tr')
+                $("#tablemais tr").remove();
+                //var tb = document.getElementById('tablemais');
+                //var tr = tb.closest('tr');
                 //tr.remove(); 
 
-                $.post('maisVendidos', { datamin: mindata, datamax: maxdata }, function (dados) {
-                    console.log(dados);
-
+                $.post('maisVendidos', { datamin: minelement, datamax: maxelement }, function (dado) {
+                    if(dado.length == 0){
+                        alert('Não há itens entre essas datas!');
+                    }
+                    else{
                     for (var i = 0; i < 9; i++) {
                         //Adicionando registros retornados na tabela
-                        $('#tablemais').append('<tr><td>' + dados[i][0] + '</td><td>' + dados[i][1] + '</td><td>' + dados[i][2] + '</td><td>'
-                            + dados[i][3] + '</td><td>' + dados[i][4] + '</td></tr>');
+                        $('#tablemais').append('<tr><td>' + dado[i][0] + '</td><td>' + dado[i][1] + '</td><td>' + dado[i][2] + '</td><td>'
+                            + dado[i][3] + '</td><td>' + dado[i][4] + '</td></tr>');
                     }
-
+                }
                 });
             });
 
@@ -124,36 +127,41 @@ $(document).ready(function () {
                 $(this).val('');
             });
 
-//----
-            $('input[name="datefiltermenos"]').daterangepicker({
+//------------------------
+            $('#filtermenos').daterangepicker({
                 autoUpdateInput: false,
                 locale: {
                     cancelLabel: 'Clear',
                 }
             });
 
-            $('input[name="datefiltermenos"]').on('apply.daterangepicker', function (ev, picker) {
+            $('#filtermenos').on('apply.daterangepicker', function (ev, picker) {
                 $(this).val(picker.startDate.format('YYYY-MM-DD') + ' / ' + picker.endDate.format('YYYY-MM-DD'));
-                var data = document.getElementById('datemais')
+                var data = document.getElementById('filtermenos')
                 var mindata = data.value.substring(0, data.value.indexOf("/"));
                 var maxdata = data.value.substring(data.value.indexOf("/") + 1, data.value.length);
+                $("#tablemenos tr").remove();
 
                 //var tb = document.getElementById('tablemais')
                 //var tr = tb.closest('tr')
                 //tr.remove(); 
 
                 $.post('menosVendidos', { datamin: mindata, datamax: maxdata }, function (dados) {
-                    console.log(dados);
-
+                    console.log(dados.length);
+                    if(dados.length == 0){
+                        alert('Não há itens entre essas datas!');
+                    }
+                    else{
                     for (var i = 0; i < 9; i++) {
                         //Adicionando registros retornados na tabela
                         $('#tablemenos').append('<tr><td>' + dados[i][0] + '</td><td>' + dados[i][1] + '</td><td>' + dados[i][2] + '</td><td>'
                             + dados[i][3] + '</td><td>' + dados[i][4] + '</td></tr>');
                     }
+                }
                 });
             });
 
-            $('input[name="datefiltermenos"]').on('cancel.daterangepicker', function (ev, picker) {
+            $('#filtermenos').on('cancel.daterangepicker', function (ev, picker) {
                 $(this).val('');
             });
 
