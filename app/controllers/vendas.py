@@ -57,7 +57,8 @@ def deletarPedidoItem():
     if request.method =='POST':
         idPedidoItem = request.form['idPedidoItem']
         try:
-            return jsonify(deletaPedidoItem(idPedidoItem))
+            resultado = deletaPedidoItem(idPedidoItem)
+            return jsonify(resultado)
         except mysql.connector.Error as err:
             msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)
             return redirect(url_for('vendas'))
@@ -103,13 +104,23 @@ def InserirDescontoPedido():
     if request.method =='POST':
         idPedido = request.form['idPedido']
         percDesconto = request.form['percDesconto']
+        print('entrou na rota')
         try:
-            # print(jsonify(InsertDescontoPedido(idPedido,percDesconto)))
+            print(jsonify(InsertDescontoPedido(idPedido,percDesconto)))
             return jsonify(InsertDescontoPedido(idPedido,percDesconto))
         except mysql.connector.Error as err:
             msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)  
             return redirect(url_for('vendas'))
 
+@app.route('/FinalizarPedido', methods=['POST','GET'])
+def FinalizarPedido():
+    if request.method =='POST':
+        idPedido = request.form['idPedido']
+        try:
+            return jsonify(InsertVenda(idPedido))
+        except mysql.connector.Error as err:
+            msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)  
+            return redirect(url_for('vendas'))
 
 def insertPedido(cliente,usuario):
     IdUsuario = BuscaIdUsuario(usuario)
@@ -123,10 +134,15 @@ def InsertPedidoItem(idPedido, idProduto, QuantidadePedidoItem):
     connection.commit()
 
 def InsertDescontoPedido(idPedido, percDesconto):
+    print(idPedido, percDesconto)
     cursor = connection.cursor()
-    cursor.execute("INSERT INTO PedidosDescontos (idPedido, percentualDesconto) VALUES (%s,%s)", (idPedido,percDesconto))
+    cursor.execute("INSERT INTO PedidosDescontos (IdPedido, PercentualDesconto) VALUES (%s,%s)", (idPedido,percDesconto))
     connection.commit()
 
+def InsertVenda(idPedido):
+    cursor = connection.cursor()
+    cursor.execute('insert into Vendas (IdPedido) values (%s)' %idPedido)          
+    connection.commit()
 
 def selectUltimoPedido():
     cursor = connection.cursor()

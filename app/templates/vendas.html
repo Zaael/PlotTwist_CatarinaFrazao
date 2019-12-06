@@ -160,16 +160,11 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-4">
-                                <label>Desconto em %</label>
-                                <input name="DescontoPedido" value="0" required type="number" class="form-control"  id="DescontoPedido">
-                        </div>
-                        <div class="form-check col-sm-3">
-                            <input name="VerificaDescontoPedido" type="checkbox" class="form-check-input"  id="ToggleDescontoPedido">
-                            <label class="form-check-label">Aplica Desconto?</label>
-                        </div>
-                        <div class="form-group col-md-4">
                             <label>Valor Final</label>
                             <input name="ValorTotalPedido" value="" readonly required type="numeric" class="form-control"  id="ValorTotalPedido">
+                        </div>
+                        <div class="form-group col-md-5">
+                            <button type="button" class="btn btn-success" disabled id="FinalizarPedido">Finalizar</button>
                         </div>
                     </div>
                 </form>
@@ -195,6 +190,7 @@
         var Quantidade ='';
         var ValorFinal = 0;
         var QuantidadeAtual = 0;
+        var ValorPorProdutoTabela = 0;
 
         $('#ListaPedidos').DataTable();
         $('.js-example-basic').select2();
@@ -239,20 +235,22 @@
         var idPedidoItem = 0;
         $('#AdicionaProdutos').click(function(){
             if ($('#ValorTotalProduto').val() != 0 && $('#ValorTotalProduto').val() !='' && $('#QuantidadePedido').val() != 0 && $('#QuantidadePedido').val() != '') {
+                $('#FinalizarPedido').prop("disabled",false);
                 $.post("AdicionaPedidoItem",{idPedido:IdPedido,idProduto:IdProduto,QuantidadePedidoItem:QuantidadeAtual},function(data){
-                    var ValorPorProdutoTabela = data[0][8];
+                    ValorPorProdutoTabela = data[0][8];
                     var last_element = data[data.length - 1];
                     console.log(last_element[0]);
                     idPedidoItem = last_element[0];
-                    PreencheTabela();
                     LimpaTela();    
+                    PreencheTabela();
                     AtualizaValorFinal();
-                    $('#VerificaDescontoPedido').prop("disabled",false);
                     
                 })
+                
                 return false;
             }
         })
+
 
         function PreencheTabela(){
             var newRow = $("<tr>");
@@ -264,7 +262,7 @@
                     cols += '<td>'+ Cor +'</td>';
                     cols += '<td>'+ $('#QuantidadePedido').val() +'</td>';
                     cols += '<td>'+ $('#PrecoProduto').val() +'</td>';
-                    cols += '<td class="valorTotalSoma">'+ $('#ValorTotalProduto').val() +'</td>';
+                    cols += '<td class="valorTotalSoma">'+ ValorPorProdutoTabela.toFixed(2) +'</td>';
                     cols += '<td>';
                     cols += '<button value="'+idPedidoItem+'" class="remover btn danger fa fa-trash-o" aria-hidden="true" type="button"></button>';
                     cols += '</td>';
@@ -275,47 +273,45 @@
         function LimpaTela(){
             $('#ProdutoPedido').focus();
             $('#QuantidadePedido').val(0);
-            $('#QuantidadeDisponivelPedido').val("");
-            $('#PrecoProduto').val("");
-            $('#ValorTotalProduto').val("");
+            $('#QuantidadeDisponivelPedido').val(0);
+            $('#PrecoProduto').val(0);
+            $('#ValorTotalProduto').val(0);
         }
 
         function AtualizaValorFinal(){
+            ValorFinal = 0;
             $.post('pedidosValoresView',{idPedido: IdPedido},function(data){
-                var ValorFinal = data[0];
+                console.log('Valor final da view: ',ValorFinal, data);
+                if(data == null){
+                    ValorFinal = 0;
+                }
+                else{
+                    ValorFinal = data[0];
+                }
+                console.log('Valor final da view: ',ValorFinal);
                 $('#ValorTotalPedido').val(ValorFinal.toFixed(2));
             })
         }
 
         $("#ProdutosPedido").on("click",".remover", function(){
-            idPedidoItem = $('.remover').val();
-            $(this).closest('tr').remove();
-            $.post('deletarPedidoItem',{idPedidoItem:idPedidoItem},function(){
+            var tr = $(this).closest('tr')
+            idPedidoItem = tr.find('td').children().val();
+            tr.remove();
+            $.post('deletarPedidoItem',{idPedidoItem:idPedidoItem},function(data){
                 AtualizaValorFinal();
             })
         });
 
-        $('#ToggleDescontoPedido').change(function(){
-            ToggleDescontoPedido();
+        $('#FinalizarPedido').click(function(){
+            $.post("FinalizarPedido",{idPedido: IdPedido},function(data){
+                Swal.fire({
+                    title: 'Pedido Registrado!',
+                    icon:'success',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            })
         })
-        function ToggleDescontoPedido(){
-            if ($('#ToggleDescontoPedido').is(":checked")) {
-                    $('#DescontoPedido').prop("disabled", true);
-                    valor = $('#DescontoPedido').val();
-                    if( valor != 0){
-                        $.post('InserirDescontoPedido',{idPedido:IdPedido,percDesconto: valor},function(data){
-                            console.log(data);
-                        })
-                        AtualizaValorFinal();
-                    } 
-                }
-            else{
-                    $('#DescontoPedido').val("");
-                    $('#DescontoPedido').prop("disabled", true);
-                    AtualizaValorFinal();
-                }
-        }
-
 
     })
     
