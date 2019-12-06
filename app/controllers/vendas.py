@@ -46,11 +46,22 @@ def AdicionaPedidoItem():
         try:
             print('Entoru Pedido Itens')
             InsertPedidoItem(idPedido, idProduto, QuantidadePedidoItem)
-            print(selectUltimoPedidoItem())
-            return jsonify(selectUltimoPedidoItem())
+            view = selectPedidosItensView(idPedido)
+            return jsonify(view)
         except mysql.connector.Error as err:
             msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)
             return redirect(url_for('vendas'))
+
+@app.route('/deletarPedidoItem', methods=['POST','GET'])
+def deletarPedidoItem():
+    if request.method =='POST':
+        idPedidoItem = request.form['idPedidoItem']
+        try:
+            return jsonify(deletaPedidoItem(idPedidoItem))
+        except mysql.connector.Error as err:
+            msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)
+            return redirect(url_for('vendas'))
+
 
 @app.route('/GetProduto', methods=['GET','POST'])
 def GetProduto():
@@ -73,6 +84,33 @@ def GetProduto():
     return jsonify(dadosProduto)
 
 
+@app.route('/pedidosValoresView', methods=['POST','GET'])
+def pedidosValoresView():
+    if request.method =='POST':
+        idPedido = request.form['idPedido']
+        try:
+            cursor = connection.cursor()
+            cursor.execute("Select ValorFinal from PedidosValoresView where IdPedido = %s" %idPedido)
+            dadosPedidos = cursor.fetchone()
+            print('passou')
+        except mysql.connector.Error as err:
+            msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)  
+            return redirect(url_for('vendas'))
+    return jsonify(dadosPedidos)
+
+@app.route('/InserirDescontoPedido', methods=['POST','GET'])
+def InserirDescontoPedido():
+    if request.method =='POST':
+        idPedido = request.form['idPedido']
+        percDesconto = request.form['percDesconto']
+        try:
+            # print(jsonify(InsertDescontoPedido(idPedido,percDesconto)))
+            return jsonify(InsertDescontoPedido(idPedido,percDesconto))
+        except mysql.connector.Error as err:
+            msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)  
+            return redirect(url_for('vendas'))
+
+
 def insertPedido(cliente,usuario):
     IdUsuario = BuscaIdUsuario(usuario)
     cursor = connection.cursor()
@@ -83,6 +121,12 @@ def InsertPedidoItem(idPedido, idProduto, QuantidadePedidoItem):
     cursor = connection.cursor()
     cursor.execute('INSERT INTO PedidosItens (IdPedido, IdProduto, QtdPedidoItem)  VALUES (%s, %s, %s)', (idPedido, idProduto,QuantidadePedidoItem))            
     connection.commit()
+
+def InsertDescontoPedido(idPedido, percDesconto):
+    cursor = connection.cursor()
+    cursor.execute("INSERT INTO PedidosDescontos (idPedido, percentualDesconto) VALUES (%s,%s)", (idPedido,percDesconto))
+    connection.commit()
+
 
 def selectUltimoPedido():
     cursor = connection.cursor()
@@ -95,6 +139,18 @@ def selectUltimoPedidoItem():
     cursor.execute('SELECT IdPedidoItem FROM PedidosItens ORDER BY 1 DESC LIMIT 1')
     IdPedidoItem =  cursor.fetchone()
     return IdPedidoItem
+
+def selectPedidosItensView(idPedido):
+    cursor = connection.cursor()
+    cursor.execute('select * from PedidosItensView where idPedido = %s' %idPedido)
+    dadosPedidos = cursor.fetchall()
+    data = [list(item) for item in dadosPedidos]
+    return data
+
+def deletaPedidoItem(idPedidoItem):
+    cursor = connection.cursor()
+    cursor.execute("DELETE FROM PedidosItens WHERE idPedidoItem = %s" %idPedidoItem)
+    connection.commit()
 
 def listaPedidos():
     cursor = connection.cursor()
