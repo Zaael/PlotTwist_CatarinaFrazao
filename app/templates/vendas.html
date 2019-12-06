@@ -302,9 +302,13 @@
             })
         });
 
+        var idVenda = 0;
         $('#FinalizarPedido').click(function(){
+            FinalizaPedido();
+        })
+        function FinalizaPedido(){
             $.post("FinalizarPedido",{idPedido: IdPedido},function(data){
-                var idVenda = data[0];
+                idVenda = data[0];
                 console.log(idVenda)
                 Swal.fire({
                     title: 'Pedido Registrado!',
@@ -312,15 +316,17 @@
                     showConfirmButton: true
                 }).then((result)=>{
                     if(result.value){
-                        $.post("AtualizaEstoque",{idVenda:idVenda},function(data){
-                            alert('Deu certo!');
-                        })
                         $(location).attr('href','vendas');
                     }
                 })
             })
-        })
+        }
 
+        function AtualizaEstoque(){
+            $.post('AtualizaEstoque',{idVenda:idVenda},function(data){
+                alert('Deu certo!');
+            })
+        }
     })
     
     

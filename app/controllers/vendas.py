@@ -117,8 +117,14 @@ def FinalizarPedido():
     if request.method =='POST':
         idPedido = request.form['idPedido']
         try:
+            print('Entrou no finaliza')
             InsertVenda(idPedido)
-            return jsonify(selectUltimaVenda())
+            print('inseriu Venda')
+            idVenda = selectUltimaVenda()
+            print(idVenda)
+            AtualizarEstoque(idVenda)
+            print('passou atualizar')
+            return jsonify(idVenda)
         except mysql.connector.Error as err:
             msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)  
             return redirect(url_for('vendas'))
@@ -128,16 +134,29 @@ def AtualizaEstoque():
     if request.method == 'POST':
         idVenda = request.form['idVenda']
         try:
+            print('entrou try atualizaestoque')
             cursor = connection.cursor()
-            cursor.callproc("AtualizaEstoque",[idVenda,])
+            print('entrou no cursor')
+            cursor.callproc('AtualizaEstoque',[idVenda])
             dados = ''
             for result in cursor.stored_results():
                 dados = result.fetchall()
-            cursor.commit()
+            print(dados)
             return jsonify(dados)
         except mysql.connector.Error as err:
             msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)  
             return redirect(url_for('vendas'))
+        # finally:
+        #     if (connection.is_connected()):
+        #         cursor.close()
+        #         connection.close()
+
+def AtualizarEstoque(idVenda):
+    connection = db.db_connection()
+    cursor = connection.cursor()
+    cursor.callproc('AtualizaEstoque',[idVenda])
+    connection.commit()
+    print('executou')
 
 
 def insertPedido(cliente,usuario):
@@ -165,7 +184,9 @@ def InsertVenda(idPedido):
 def selectUltimaVenda():
     cursor = connection.cursor()
     cursor.execute('SELECT IdVenda FROM Vendas ORDER BY 1 DESC LIMIT 1')
-    IdVenda =  cursor.fetchone()
+    dados =  cursor.fetchone()
+    IdVenda = dados[0]
+    print('id vinda do select')
     return IdVenda
 
 def selectUltimoPedido():
