@@ -62,11 +62,11 @@ def deletar_fornecedor():
         idFornecedor = request.form['id']
         print(idFornecedor)
         try:
-            deletarFornecedor(idFornecedor)
-            return redirect(url_for('fornecedores'))
+            msg = deletarFornecedor(idFornecedor)
+            return msg
         except mysql.connector.Error as err:
-            msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)
-            return redirect(url_for('fornecedores'))
+            msg = 'Ops! Não é possível excluir este cliente!'
+            return msg
 
 def ListaFornecedores():
     cursor = connection.cursor()
@@ -85,3 +85,4 @@ def deletarFornecedor(id):
     cursor = connection.cursor()
     cursor.execute('DELETE FROM Fornecedor WHERE idFornecedor = %s' %id)
     connection.commit()
+    return 'Deletado!'

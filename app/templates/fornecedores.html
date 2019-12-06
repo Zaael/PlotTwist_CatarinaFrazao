@@ -208,20 +208,17 @@
                 cancelButtonText: 'Cancelar!',
             }).then((result) => {
                 if (result.value){
+                    $.post('deletar_fornecedor', { id: idFornecedor }, function(msg){
                     Swal.fire({
-                        title: 'Deletado!',
-                        icon:'success',
+                        title: msg,
+                        icon: 'info',
                         showConfirmButton: false,
-                        timer: 1500
-
-                    })
-
-                    $.post('deletar_fornecedor', { id: idFornecedor } ,function(){
-                        window.location.href("/fornecedores");
+                        timer: 2500
+                    });
                     });
                 }
-            })
-        }) 
+            });
+        });
 //Variaveis FORM 
         var statusNome = null;
         var statusCNPJ = null;

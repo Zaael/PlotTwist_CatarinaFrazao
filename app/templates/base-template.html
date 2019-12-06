@@ -9,9 +9,9 @@
 
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/datepicker3.css') }}">
+	<!--<link rel="stylesheet" href="{{ url_for('static', filename='css/datepicker3.css') }}"> -->
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>-->
 	<!--Custom Font-->
 	<link href="https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,500i,600,600i,700,700i"
 		rel="stylesheet">
@@ -23,7 +23,9 @@
 	src="https://code.jquery.com/jquery-2.2.4.min.js"
 	integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
 	crossorigin="anonymous"></script>
-
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 	<!--validar CPF  -->
     <!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.0/jquery.mask.js"></script>-->
 	<script src="{{ url_for('static', filename='js/jquery.mask.min.js') }}"></script>
@@ -62,11 +64,11 @@
 		</div>
 		<div class="divider"></div>
 		<ul class="nav menu">
-			<li><a href="index.html"><em class="fa fa-home ">&nbsp;</em> Home</a></li>
+			<li><a href="{{url_for('home')}}"><em class="fa fa-home ">&nbsp;</em> Home</a></li>
 			<li><a href="widgets.html"><em class="fa fa-usd ">&nbsp;</em> Vendas</a></li>
 			<li><a href="{{url_for('cliente')}}"><em class="fa fa-handshake-o ">&nbsp;</em>Clientes</a></li>
 			<li><a href="{{url_for('fornecedores')}}"><em class="fa fa-users ">&nbsp;</em>Fornecedores</a></li>
-			<li><a href="{{url_for('produto')}}"><em class="fa fa-shopping-bag ">&nbsp;</em>Produtos</a></li>
+			<li><a href=""><em class="fa fa-shopping-bag ">&nbsp;</em>Produtos</a></li>
 			<li><a href="{{ url_for('logout') }}"><em class="fa fa-power-off">&nbsp;</em>Logout</a></li>
 		</ul>
 	</div>
@@ -98,8 +100,8 @@
 
 	<!-- <script src="{{ url_for('static', filename='js/jquery-1.11.1.min.js') }}"></script> -->
 	<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-	<script src="{{ url_for('static', filename='js/bootstrap-datepicker.js') }}"></script>
-	<script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+	<!--<script src="{{ url_for('static', filename='js/bootstrap-datepicker.js') }}"></script> -->
+	<!--<script src="{{ url_for('static', filename='js/custom.js') }}"></script>-->
 
 </body>
 

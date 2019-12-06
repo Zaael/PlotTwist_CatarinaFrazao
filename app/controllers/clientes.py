@@ -18,10 +18,11 @@ def cliente():
                                 username=session['username'],
                                 loggedin=session['loggedin'],
                                 breadcrumb='Clientes',
-                                page_header='Ações em Clientes')
+                                page_header='Ações em Clientes',
+                                msg = msg)
     return redirect(url_for('login'))
 
-
+msg = None
 @app.route('/criar_cliente', methods=['GET','POST'])
 def criar_cliente():
     if  request.method == 'POST':
@@ -60,7 +61,7 @@ def deletar_cliente():
             msg = deletarCliente(idcliente)
             return msg
         except mysql.connector.Error as err:
-            msg = 'Ops! Algo deu errado. Tente novamente. Erro: {}'.format(err)
+            msg = 'Ops! Não é possível excluir este cliente!'
             return msg
 
 
@@ -79,13 +80,13 @@ def atualizaCliente(id, nome, CPF, Celular, Email):
 
 def deletarCliente(id):
     cursor = connection.cursor()
-    print('opa')
     cursor.execute("DELETE FROM cliente WHERE idCliente = %s" % id)
     connection.commit()
     return 'Deletado!'
 
 def criaCliente(nome, CPF, Celular, Email):
     cursor = connection.cursor()
-    cursor.execute("insert into Cliente (Nome, CPF, Celular, Email) values (%s, replace(replace(%s, '.', ''), '-', '') \
+    print(nome, CPF, Celular, Email)
+    cursor.execute("INSERT INTO Cliente (Nome, CPF, Celular, Email) VALUES (%s, replace(replace(%s, '.', ''), '-', '') \
     , replace(replace(replace(replace(%s, '(', ''), ')', ''), '-', ''), ' ', ''), %s )",(nome, CPF, Celular, Email))
     connection.commit()

@@ -93,12 +93,10 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Alteração de Cliente</h4>
-                <button type="button" class="close" data-dismiss="modal">
-                    &times;
                 </button>
             </div>
             <div class="modal-body mx-3">
-                <form name="formAlterar"  role="form" method="POST" action="{{ url_for('alterar_cliente') }}">
+                <form name="formAlterar" id='formAlterar' role="form" method="POST" action="{{ url_for('alterar_cliente') }}">
                     <div class="md-form mb-5">
                         <label for="idCliente">Id</label>
                         <input value="{{ cliente[0] }}" class="form-control validate" name="idCliente" id="idCliente" maxlength="55" 
@@ -134,10 +132,11 @@
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                 </form>
             </div>
-
         </div>
     </div>
 </div>
+{% endfor %}
+
 
 <!--/Modal do Botão para Criar-->
 <div class="modal fade" id="ModalAdicionaCliente">
@@ -176,7 +175,7 @@
                     <p class="text-info"><b>**Campos Obrigatórios</b></p>
                     <br>
                     <button type="submit" class="btn btn-success">Salvar</button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="">Close</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                 </form>
             </div>
         </div>
@@ -184,13 +183,13 @@
 </div>
 
 
-{% endfor %}
-
 <script>
+    /*
 $('#ModalAdicionaCliente').on('hidden.bs.modal', function (event) {
   console.log('Destroy modal');
 
 });
+*/
 
     $(document).ready(function () {
 
@@ -212,9 +211,9 @@ $('#ModalAdicionaCliente').on('hidden.bs.modal', function (event) {
                     $.post('deletar_cliente', { id: idCliente }, function(msg){
                     Swal.fire({
                         title: msg,
-                        icon: 'success',
+                        icon: 'info',
                         showConfirmButton: false,
-                        timer: 1500
+                        timer: 2500
                     })}
                     );
 
@@ -236,28 +235,28 @@ $('#ModalAdicionaCliente').on('hidden.bs.modal', function (event) {
         var statusCelular = null;
         var statusEmail = null;
 
-        var idCPF = document.getElementById("idCPF")
-        var divCPF = document.getElementById("divCPF")
+        var idCPF = document.getElementById("idCPF");
+        var divCPF = document.getElementById("divCPF");
 
-        var idEmail = document.getElementById("idEmail")
-        var divEmail = document.getElementById("divEmail")
+        var idEmail = document.getElementById("idEmail");
+        var divEmail = document.getElementById("divEmail");
   
 
-        var idCelular = document.getElementById("idCelular")
-        var divCelular = document.getElementById("divCelular")
+        var idCelular = document.getElementById("idCelular");
+        var divCelular = document.getElementById("divCelular");
 
-        var idNome = document.getElementById("idNome")
-        var divNome = document.getElementById("divNome")
+        var idNome = document.getElementById("idNome");
+        var divNome = document.getElementById("divNome");
 
-        var idAltEmail = document.getElementById("idAltEmail")
-        var divAltEmail = document.getElementById("divAltEmail")
+        var idAltEmail = document.getElementById("idAltEmail");
+        var divAltEmail = document.getElementById("divAltEmail");
   
 
-        var idAltCelular = document.getElementById("idAltCelular")
-        var divAltCelular = document.getElementById("divAltCelular")
+        var idAltCelular = document.getElementById("idAltCelular");
+        var divAltCelular = document.getElementById("divAltCelular");
 
-        var idAltNome = document.getElementById("idAltNome")
-        var divAltNome = document.getElementById("divAltNome")
+        var idAltNome = document.getElementById("idAltNome");
+        var divAltNome = document.getElementById("divAltNome");
 
 
         function acaoInput(func, div) {
@@ -287,6 +286,24 @@ form.addEventListener('submit', function(e) {
             if ((statusNome == true) &&
             (statusCPF == true) &&
             (statusCelular == true) &&
+            (statusEmail == true || statusEmail == 'none' || statusEmail == null))
+            {
+                Swal.fire({
+                        title: 'Cadastro realizado!',
+                        icon: 'success',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+            }
+            else {e.preventDefault();}
+
+        });
+
+var formAlt = document.getElementById('formAlterar');
+
+formAlt.addEventListener('submit', function(e) {
+            if ((statusNome == true) &&
+            (statusCelular == true) &&
             (statusEmail == true || statusEmail == 'none'))
             {
                 Swal.fire({
@@ -300,27 +317,13 @@ form.addEventListener('submit', function(e) {
 
         })
        
-
+function teste (){
+    alert('teste');
+}
 //Validar Email
-        idEmail.addEventListener("blur", function () {
-            var ret = acaoInput(validarEmail(idEmail), divEmail);
-            if (ret){
-                document.getElementById("msgemail").innerHTML = "<font color ='green'> E-mail válido! </font>" ;
-
-            }
-            if (ret == false){
-                document.getElementById("msgemail").innerHTML = "<font color ='red'> E-mail inválido! </font>";
-
-            }
-            if (ret == 'none'){
-                document.getElementById("msgemail").innerHTML = "";
-            }
-        });
-        idAltEmail.addEventListener("blur", function () {
+        idAltEmail.addEventListener("blur", function (e) {
             var ret = acaoInput(validarEmail(idAltEmail), divAltEmail);
-            console.log('opa')
-            if (ret == true){
-                console.log('bom')
+            if (ret){
 
                 document.getElementById("msgaltemail").innerHTML = "<font color ='green'> E-mail válido! </font>" ;
             }
@@ -332,6 +335,21 @@ form.addEventListener('submit', function(e) {
 
             }
         });
+        idEmail.addEventListener("blur", function (e) {
+            var ret = acaoInput(validarEmail(idEmail), divEmail);
+            if (ret){
+                document.getElementById("msgemail").innerHTML = "<font color ='green'> E-mail válido! </font>";
+
+            }
+            if (ret == false){
+                document.getElementById("msgemail").innerHTML = "<font color ='red'> E-mail inválido! </font>";
+
+            }
+            if (ret == 'none'){
+                document.getElementById("msgemail").innerHTML = "";
+            }
+        });
+
         function validarEmail(field) {
             var usuario = field.value.substring(0, field.value.indexOf("@"));
             var dominio = field.value.substring(field.value.indexOf("@") + 1, field.value.length);
@@ -426,6 +444,7 @@ form.addEventListener('submit', function(e) {
             }
         });
         idAltCelular.addEventListener("blur", function () {
+            console.log('veio')
             var ret = acaoInput(validPhone(idAltCelular), divAltCelular);
             if (ret == true){
                 document.getElementById("msgaltcelular").innerHTML = "<font color ='green'> Celular válido! </font>" ;
