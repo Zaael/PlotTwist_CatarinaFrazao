@@ -117,10 +117,28 @@ def FinalizarPedido():
     if request.method =='POST':
         idPedido = request.form['idPedido']
         try:
-            return jsonify(InsertVenda(idPedido))
+            InsertVenda(idPedido)
+            return jsonify(selectUltimaVenda())
         except mysql.connector.Error as err:
             msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)  
             return redirect(url_for('vendas'))
+
+@app.route('/AtualizaEstoque', methods=['POST','GET'])
+def AtualizaEstoque():
+    if request.method == 'POST':
+        idVenda = request.form['idVenda']
+        try:
+            cursor = connection.cursor()
+            cursor.callproc("AtualizaEstoque",[idVenda,])
+            dados = ''
+            for result in cursor.stored_results():
+                dados = result.fetchall()
+            cursor.commit()
+            return jsonify(dados)
+        except mysql.connector.Error as err:
+            msg = 'Ops! Algo deu errado. Verifique as informações e tente novamente. Erro: {}'.format(err)  
+            return redirect(url_for('vendas'))
+
 
 def insertPedido(cliente,usuario):
     IdUsuario = BuscaIdUsuario(usuario)
@@ -143,6 +161,12 @@ def InsertVenda(idPedido):
     cursor = connection.cursor()
     cursor.execute('insert into Vendas (IdPedido) values (%s)' %idPedido)          
     connection.commit()
+
+def selectUltimaVenda():
+    cursor = connection.cursor()
+    cursor.execute('SELECT IdVenda FROM Vendas ORDER BY 1 DESC LIMIT 1')
+    IdVenda =  cursor.fetchone()
+    return IdVenda
 
 def selectUltimoPedido():
     cursor = connection.cursor()

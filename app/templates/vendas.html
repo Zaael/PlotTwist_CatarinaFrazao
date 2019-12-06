@@ -237,12 +237,12 @@
             if ($('#ValorTotalProduto').val() != 0 && $('#ValorTotalProduto').val() !='' && $('#QuantidadePedido').val() != 0 && $('#QuantidadePedido').val() != '') {
                 $('#FinalizarPedido').prop("disabled",false);
                 $.post("AdicionaPedidoItem",{idPedido:IdPedido,idProduto:IdProduto,QuantidadePedidoItem:QuantidadeAtual},function(data){
-                    ValorPorProdutoTabela = data[0][8];
                     var last_element = data[data.length - 1];
                     console.log(last_element[0]);
+                    ValorPorProdutoTabela = last_element[8];
                     idPedidoItem = last_element[0];
-                    LimpaTela();    
                     PreencheTabela();
+                    LimpaTela();    
                     AtualizaValorFinal();
                     
                 })
@@ -304,11 +304,19 @@
 
         $('#FinalizarPedido').click(function(){
             $.post("FinalizarPedido",{idPedido: IdPedido},function(data){
+                var idVenda = data[0];
+                console.log(idVenda)
                 Swal.fire({
                     title: 'Pedido Registrado!',
                     icon:'success',
-                    showConfirmButton: false,
-                    timer: 1500
+                    showConfirmButton: true
+                }).then((result)=>{
+                    if(result.value){
+                        $.post("AtualizaEstoque",{idVenda:idVenda},function(data){
+                            alert('Deu certo!');
+                        })
+                        $(location).attr('href','vendas');
+                    }
                 })
             })
         })
